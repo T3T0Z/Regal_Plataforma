@@ -1,0 +1,135 @@
+﻿@model VM_GestionUsuarios;
+
+<div class="container">
+    <h3 class="text-center mb-4 titulo-filtro">Gestión de Usuarios</h3>
+
+    <div class="search-container mb-3">
+        <input type="text" id="searchInput" class="form-control mb-3 search-encargos" placeholder="Buscar usuario...">
+    </div>
+
+    <div class="btn-container my-lg-3 text-center">
+        <button class="btn filter-btn active" data-rol="todos" onclick="filtrarUsuarios('todos')">Todos</button>
+        <button class="btn filter-btn" data-rol="Gestor" onclick="filtrarUsuarios('Gestor')">Gestores</button>
+        <button class="btn filter-btn" data-rol="Operario" onclick="filtrarUsuarios('Operario')">Operarios</button>
+        <button class="btn filter-btn" data-rol="Externo" onclick="filtrarUsuarios('Externo')">Externos</button>
+    </div>
+
+    <div class="card-container">
+        <partial name="~/Views/Usuarios/_listaUsuarios.cshtml" model="@Model" />
+    </div>
+
+    <div class="btn-container my-lg-3 text-center">
+        <button class="btn" onclick="cargarPartialEnModal('modalLg', '/Usuarios/GetCreateEditUsuario', 'modalLgBody')">
+            <i class="fa-solid fa-user-plus mr-1"></i> Nuevo Usuario
+        </button>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        function filtrarUsuarios(filtro) {
+            $(".filter-btn").removeClass("active");
+            $(`.filter-btn[data-rol='${filtro}']`).addClass("active");
+
+            $(".card-custom").each(function () {
+                var rol = $(this).data("rol");
+                if (filtro === "todos" || rol.includes(filtro)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        $("#searchInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $(".card-custom").each(function () {
+                var texto = $(this).text().toLowerCase();
+                $(this).toggle(texto.includes(value));
+            });
+        });
+
+        function verDetallesUsuario(usuarioPk) {
+            window.location.href = `/Usuarios/DetallesUsuario?UsuarioPk=${usuarioPk}`;
+        }
+
+        function guardarUsuario() {
+            const formData = $("#formUsuario").serialize();
+            $.post('/Usuarios/CreateEditUsuario', formData, function (res) {
+                if (res.status === "OK") {
+                    $('#modalLg').modal('hide');
+                    Swal.fire("Correcto", "Usuario guardado", "success").then(() => location.reload());
+                } else {
+                    Swal.fire("Error", res.message, "error");
+                }
+            });
+        }
+
+        function eliminarUsuario(usuarioPk) {
+            // Swal.fire({
+            //     title: "¿Estás seguro?",
+            //     text: "Eliminarás este usuario.",
+            //     icon: "warning",
+            //     showCancelButton: true,
+            //     confirmButtonText: "Sí, eliminar",
+            //     cancelButtonText: "Cancelar"
+            // }).then((result) => {
+            //     if (result.isConfirmed) {
+            //         $.post('/Usuarios/DeleteUsuario', { usuarioPk }, function (res) {
+            //             if (res.status === "OK") location.reload();
+            //             else Swal.fire("Error", res.message, "error");
+            //         });
+            //     }
+            // });
+            Swal.fire({
+                title: "¿Estás seguro de eliminar este usuario?",
+                text: "No podrás revertir esta acción",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Eliminar",
+                cancelButtonText:"Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Usuarios")', // Asegúrate de que la ruta es correcta
+                        type: 'POST',
+                        data: { usuarioPk: usuarioPk},
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === "OK") {
+                                // Actualiza el contenido de la partial view del encargo
+                                $(".notasEncargo").html(response.partial);
+                                Swal.fire({
+                                    timer: 1500,
+                                    title: "Eliminada",
+                                    text: "El usuario ha sido eliminado",
+                                    icon: "success"
+                                });
+                            } else {
+                                Swal.fire({
+                                    timer: 1500,
+                                    icon: "error",
+                                    title: "ERROR",
+                                    text: response.message,
+                                    footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                timer: 1500,
+                                icon: "error",
+                                title: "ERROR",
+                                text: "El usuario no ha sido eliminado",
+                                footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

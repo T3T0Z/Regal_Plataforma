@@ -1,0 +1,298 @@
+﻿@model VM_GestionObras
+
+<div class="container">
+    <h3 class="text-center mb-3 titulo-filtro">Listado de Obras</h3>
+
+    <!-- Buscador -->
+    <div class="search-container">
+        <input type="text" id="searchInput" class="form-control mb-3 search-encargos" placeholder="Buscar obra o cliente...">
+    </div>
+
+    <!-- Botones de filtro por estado de obra -->
+    <div class="btn-container my-lg-3">
+        <button class="btn filter-btn active" onclick="filtrarTarjetas('todos')" data-estado="todos">
+            Todos (@Model.listObras.Count())
+        </button>
+
+        @foreach (var estado in Model.listEstadosObras)
+        {
+            <button class="btn filter-btn" onclick="filtrarTarjetas(@estado.EstadoObrasPk)" data-estado="@estado.EstadoObrasPk">
+                @estado.Estado (@Model.listObras.Count(x => x.EstadoObraPk == estado.EstadoObrasPk))
+            </button>
+        }
+    </div>
+
+    <!-- Botón para crear obra -->
+    <div class="btn-container mb-4 text-center">
+        <button class="btn filter-btn" onclick="cargarPartialEnModal('modalLg', '/Obras/GetCreateEdit', 'modalLgBody')">
+            <i class="fa-solid fa-plus mr-1"></i> Nueva Obra
+        </button>
+    </div>
+
+    <!-- Contenedor de cards -->
+    <div class="card-container">
+        @foreach (var obra in Model.listObras)
+        {
+            <div class="card card-custom" data-estado="@obra.EstadoObraPk" onclick="cargarPartialEnModal('modalLg', '@($"/Clientes/GetCreateEdit?ObraPk={obra.ObraPk}")', 'modalLgBody')">
+                <div class="card-content">
+                    <div class="card-header card-header-obras">
+                        <span><strong>Obra:</strong> @obra.Nombre</span>
+                        <div class="btn-obras-header">
+                            <button type="button"
+                                    class="btn btn-sm"
+                                    onclick="event.stopPropagation(); cargarPartialEnModal('modalLg', '@($"/Obras/GetNotasObra?Obra_PK={obra.ObraPk}")', 'modalLgBody')">
+                                <i class="fa-solid fa-note-sticky"></i> Ver Notas
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Cliente:</strong>
+                            <span class="card-encargos text-truncate">@obra.ClientePkNavigation?.Nombre</span>
+                        </div>
+                        <div class="col-md-8">
+                            <strong class="card-enunciados">Dirección:</strong>
+                            <span class="card-encargos text-truncate">@obra.DireccionPkNavigation?.NombreVia</span>
+                        </div>
+                    </div>
+
+                    <div class="row mt-0">
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Estado:</strong>
+                            <span class="card-encargos">@obra.EstadoObraPkNavigation.Estado</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Fch Ini Asgnd:</strong>
+                            <span class="card-encargos">@obra.FechaAsignada?.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Fch Fin Asgnd:</strong>
+                            <span class="card-encargos">@obra.FechaFinAsignada?.ToString("dd/MM/yyyy")</span>
+                        </div>
+                    </div>
+
+
+                    <div class="row mt-0">
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Gestor:</strong>
+                            <span class="card-encargos">@obra.UgestorPkNavigation.Nombre</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Fch Ini:</strong>
+                            <span class="card-encargos">@obra.Fecha?.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Fch Fin:</strong>
+                            <span class="card-encargos">@obra.FechaFin?.ToString("dd/MM/yyyy")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <i class="fa-solid fa-circle-up fa-beat fa-2xl" id="btnScrollTop" onclick="scrollToTop()"></i>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Detectar tecla en buscador y aplica filtros
+            $("#searchInput").on("keyup", function () {
+                applyFilters();
+            });
+
+            window.addEventListener("scroll", function () {
+                var btn = document.getElementById("btnScrollTop");
+                btn.style.display = window.scrollY > 100 ? "block" : "none";
+                btn.style.marginBottom = (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) ? '2%' : '1%';
+            });
+        });
+
+        // Función que aplica los filtros de estado, texto y gremio
+        function applyFilters()
+        {
+            var searchValue = $("#searchInput").val().toLowerCase();
+            var activeEstado = String($(".filter-btn.active").data("estado"));
+
+            $(".card-custom").each(function () {
+                var card = $(this);
+                var cardText = card.find(".card-content").text().toLowerCase();
+                var cardEstado = card.attr("data-estado");
+
+                var matchEstado = (activeEstado === "todos" || cardEstado === activeEstado);
+                var matchBusqueda = cardText.includes(searchValue);
+
+                if (matchEstado && matchBusqueda) {
+                    card.show();
+                } else {
+                    card.hide();
+                }
+            });
+        }
+
+        // Función para filtrar según estado (se ejecuta al hacer clic en un botón)
+        function filtrarTarjetas(estado) {
+            $(".filter-btn").removeClass("active");
+            $(`.filter-btn[data-estado='${estado}']`).addClass("active");
+            applyFilters();
+        }
+
+        function editarObra(obraPk)
+        {
+            $.ajax({
+                url: "/Obras/GetEdit",
+                method: 'GET',
+                data: { ObraPk: obraPk },
+                success: function (res) {
+                    $("#modalLgBody").html(res.partial);
+                    $("#modalLg").modal('show');
+                },
+                error: function () {
+                    Swal.fire({ icon: "error", title: "Error", text: "No se pudo cargar la obra." });
+                }
+            });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function guardarObra()
+        {
+            // Verifica si el formulario es válido antes de hacer submit
+            if (!$("#formObra").valid()) {
+                return;
+            }
+
+            let formData = $("#formObra").serialize();
+
+            $.ajax({
+                url: '/Obras/Guardar',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status === "OK") {
+                        $('#modalGeneral').modal('hide');
+                        Swal.fire({
+                            title: 'Correcto',
+                            text: 'Obra guardada con éxito.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload(); // Recarga para actualizar lista
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error actualizando obra'
+                    });
+                }
+            });
+        }
+
+        function crearNota(Obra_PK) {
+            let formData = $("#formNotaObra").serialize();
+
+            $.ajax({
+                url: '@Url.Action("CreateEditNotaObra", "Obras")', // Asegúrate de que la ruta es correcta
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.status === "OK") {
+                        swal.fire({
+                            timer: 1500,
+                            title: "CORRECTO",
+                            text: "La nota ha sido creada",
+                            icon: "success"
+                        });
+
+                        cargarPartialEnModal('modalLg', "/Obras/GetNotasObra?Obra_PK=" + Obra_PK, 'modalLgBody');
+                    } else {
+                        Swal.fire({
+                            timer: 1500,
+                            icon: "error",
+                            title: "ERROR",
+                            text: response.message,
+                            footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        timer: 1500,
+                        icon: "error",
+                        title: "ERROR",
+                        text: "Error creando nota",
+                        footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                    });
+                }
+            });
+        }
+
+        // Eliminar nota vía AJAX
+        function eliminarNota(id, Obra_PK) {
+            Swal.fire({
+                title: "¿Estás seguro de eliminar esta nota?",
+                text: "No podrás revertir esta acción",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Eliminar",
+                cancelButtonText:"Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("DeleteNotaObra", "Obras")', // Asegúrate de que la ruta es correcta
+                        type: 'POST',
+                        data: { NotasObra_PK: id, Obra_PK: Obra_PK },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === "OK") {
+                                // Actualiza el contenido de la partial view del encargo
+                                Swal.fire({
+                                    timer: 1500,
+                                    title: "Eliminada",
+                                    text: "La nota ha sido eliminada",
+                                    icon: "success"
+                                });
+                                cargarPartialEnModal('modalLg', "/Obras/GetNotasObra?Obra_PK=" + Obra_PK, 'modalLgBody');
+
+                            } else {
+                                Swal.fire({
+                                    timer: 1500,
+                                    icon: "error",
+                                    title: "ERROR",
+                                    text: response.message,
+                                    footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                timer: 1500,
+                                icon: "error",
+                                title: "ERROR",
+                                text: "La nota ha sido eliminada",
+                                footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+    </script>
+}

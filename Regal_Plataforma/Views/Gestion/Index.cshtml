@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Bienvenido al Portal";
+}
+
+<div class="container text-center mt-5">
+    <h1 class="display-4 no-click">Bienvenido al Portal de Gestión</h1>
+    <p class="lead no-click">Accede a todas las funcionalidades del sistema de manera rápida y sencilla.</p>
+
+    <div class="row mt-4">
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Encargos" asp-action="Index" class="btn btn-primary btn-lg">Gestionar Encargos</a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Obras" asp-action="Index" class="btn btn-primary btn-lg">Gestionar Obras</a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Usuarios" asp-action="Index" class="btn btn-primary btn-lg">Gestionar Usuarios</a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a asp-controller="Clientes" asp-action="Index" class="btn btn-primary btn-lg">Gestionar Clientes</a>
+        </div>
+    </div>
+
+    <div class="mt-5 no-click">
+        <img src="/images/logo.png" alt="Regal Asistencia" class="img-fluid rounded no-click">
+    </div>
+</div>

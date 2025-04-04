@@ -1,0 +1,192 @@
+﻿@model VM_GestionEncargos
+
+<div class="container">
+    <h3 class="text-center mb-lg-3 titulo-filtro">Listado de Encargos</h3>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="form-control mb-3 search-encargos" placeholder="Buscar...">
+    </div>
+
+    <!-- Botones de filtro estado -->
+    <div class="btn-container my-lg-3">
+        <button class="btn filter-btn active" data-estado="todos" onclick="filtrarTarjetas('todos')">Todos (@Model.listOrderDatos.Count())</button>
+        <button class="btn filter-btn" data-estado="Nuevo" onclick="filtrarTarjetas('Nuevo')">Nuevo (@Model.listOrderDatos.Where(x=> x.SiniestroPkNavigation.Estado == "Nuevo").Count())</button>
+        <button class="btn filter-btn" data-estado="Gestiones" onclick="filtrarTarjetas('Gestiones')">En Gestion (@Model.listOrderDatos.Where(x=> x.SiniestroPkNavigation.Estado == "Gestiones").Count())</button>
+        <button class="btn filter-btn" data-estado="Pendiente Info" onclick="filtrarTarjetas('Pendiente Info')">Pendiente Info (@Model.listOrderDatos.Where(x=> x.SiniestroPkNavigation.Estado == "Pendiente Info").Count())</button>
+        <button class="btn filter-btn" data-estado="Finalizado" onclick="filtrarTarjetas('Finalizado')">Finalizado (@Model.listOrderDatos.Where(x=> x.SiniestroPkNavigation.Estado == "Finalizado").Count())</button>
+    </div>
+    
+    <!-- Filtro de Gremio -->    
+    <div class="btn-container mb-ld-3">
+        <select class="selectpicker filter-gremio" multiple data-selected-text-format="count > 0" data-actions-box="true" title="Seleccione gremio">
+            @foreach(var gremio in Model.listGremios)
+            {
+                <option value="@gremio.Nombre" selected>@gremio.Nombre </option>
+            }
+        </select>
+    </div>
+    
+
+    <div class="card-container">
+        @foreach (var order in Model.listOrderDatos)
+        {
+            <div class="card card-custom" data-estado="@order.SiniestroPkNavigation.Estado" data-gremio="@order.GremioPkNavigation?.Nombre" onclick="verDetalles(@order.OrderDatosPk)">
+                <div class="card-content">
+                    <!-- Línea superior con el Nº de siniestro -->
+                    <div class="card-header">
+                        <span><strong>Nº Siniestro:</strong> @order.SiniestroPkNavigation.DetallesSiniestroPkNavigation.NumeroSiniestro</span>
+                    </div>
+
+                    <!-- Primer bloque con Gremio y Asegurado -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Gremio:</strong>
+                            <span class="card-encargos">
+                                @(order.GremioPkNavigation == null ? "Sin Asignar" : order.GremioPkNavigation.Nombre)
+                            </span>
+                        </div>
+                        <div class="col-md-8">
+                            <strong class="card-enunciados">Asegurado:</strong>
+                            <span class="card-encargos text-truncate">
+                                @order.PaseguradoPkNavigation.Nombre @order.PaseguradoPkNavigation.Apellido1 @order.PaseguradoPkNavigation.Apellido2
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Fechas y dirección -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Fecha Siniestro:</strong>
+                            <span class="card-encargos">@order.SiniestroPkNavigation.DetallesSiniestroPkNavigation.FechaOcurrencia?.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="col-md-8">
+                            <strong class="card-enunciados">Dirección:</strong>
+                            <span class="card-encargos text-truncate">@order.DireccionPkNavigation.NombreVia</span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Fecha Encargo:</strong>
+                            <span class="card-encargos">@order.OrderDate?.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Población:</strong>
+                            <span class="card-encargos text-truncate">@order.DireccionPkNavigation.Poblacion</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Estado:</strong>
+                            <span class="card-encargos">@order.SiniestroPkNavigation.Estado</span>
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong class="card-enunciados">Descripción:</strong>
+                            <span class="card-encargos text-truncate">@order.SiniestroPkNavigation.DetallesSiniestroPkNavigation.Descripcion</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+
+    </div>
+         <i class="fa-solid fa-circle-up fa-beat fa-2xl" id="btnScrollTop" onclick="scrollToTop()"></i>
+</div>
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+
+            // Inicializa el multiselect
+            $(".selectpicker").selectpicker({
+                deselectAllText: "Ninguno",
+                selectAllText: "Todos",
+                countSelectedText: "{0} Gremios"
+            });
+            // Obtiene todos los valores de las opciones y los asigna
+            var allOptions = $(".selectpicker option").map(function() {
+                return $(this).val();
+            }).get();
+
+            // Forzar la selección de todos los elementos
+            $(".selectpicker").selectpicker('val', allOptions);
+
+            // Detectar tecla en buscador y aplica filtros
+            $("#searchInput").on("keyup", function () {
+                applyFilters();
+            });
+            
+            // Detectar tecla en filtro gremio y aplica filtros            
+            $(".filter-gremio").on("change", function () {
+                applyFilters();
+            });
+
+            // Detectar tecla en filtro estado y aplica filtros
+            $(".filter-btn").on("change", function () {
+                applyFilters();
+            });
+
+            // Mostrar u ocultar el botón según el scroll
+            window.addEventListener("scroll", function () {
+                var btn = document.getElementById("btnScrollTop");
+                btn.style.display = window.scrollY > 100 ? "block" : "none";
+                btn.style.marginBottom = (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) ? '2%' : '1%';
+            });
+        });
+
+        // Función que aplica los filtros de estado, texto y gremio
+        function applyFilters() {
+            var searchValue = $("#searchInput").val().toLowerCase();
+            var activeEstado = $(".filter-btn.active").data("estado");
+            var selected = $(".filter-gremio").find("option:selected");
+            var selectedGremios = [];
+            selected.each(function(){
+               selectedGremios.push($(this).val());
+            });
+
+            $(".card-custom").each(function () {
+                var card = $(this);
+                var cardText = card.find(".card-content").text().toLowerCase();
+                var cardEstado = card.attr("data-estado");
+                var cardGremio = card.attr("data-gremio");
+
+
+                var matchEstado = (activeEstado === "todos" || cardEstado === activeEstado);
+                var matchBusqueda = cardText.includes(searchValue);
+                var matchGremio = (selectedGremios.includes(cardGremio));
+
+                if (matchEstado && matchBusqueda && matchGremio) {
+                    card.show();
+                } else {
+                    card.hide();
+                }
+            });
+        }
+
+        // Función para filtrar según estado (se ejecuta al hacer clic en un botón)
+        function filtrarTarjetas(estado) {
+            $(".filter-btn").removeClass("active");
+            $(`.filter-btn[data-estado='${estado}']`).addClass("active");
+            applyFilters();
+        }
+
+        //Funcion para ver detalles de los siniestros
+        function verDetalles(OrderDatosPK){
+            if (OrderDatosPK) {
+                window.location.href = '/Encargos/VerDetallesEncargo?OrderDatosPK=' + OrderDatosPK;
+            } else {
+                alert('No se encontró el identificador del encargo.');
+            }
+        }
+
+        // Función para hacer scroll suave hacia arriba
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
+}

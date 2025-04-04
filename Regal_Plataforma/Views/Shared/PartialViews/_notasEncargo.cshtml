@@ -1,0 +1,50 @@
+﻿@model VM_NotasEncargo;
+
+<!-- Contenedor principal de la tarjeta -->
+<div class="encargo-container">
+    <div class="encargo-header" onclick="toggleNotasEncargoBody()">
+        <div class="header-left">
+            <span class="header-title">Notas del Encargo</span>
+        </div>
+        <!-- Se añade onclick="event.stopPropagation()" para que al interactuar con este bloque no se dispare el toggle -->
+        <div class="header-right">
+            <button class="btn-crearnota" onclick="cargarPartialEnModal('modalLg', '@($"/Encargos/GetCreateEditNotaEncargo?Siniestro_PK={Model.Encargo_PK}")', 'modalLgBody')">Nueva Nota</button>
+        </div>
+    </div>
+
+    <div class="encargo-body" id="notasencargoBody">
+        <table class="table table-striped tabla-notas align-middle">
+            <thead class="thead-notas">
+                <tr class="filas-tablasfilas-tablas-titulo">
+                    <th class="col-fecha filas-tablas-titulo">Fecha</th>
+                    <th class="col-usuario filas-tablas-titulo">Usuario</th>
+                    <th class="filas-tablas-titulo">Nota</th>
+                    <th class="col-acciones filas-tablas-titulo">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.listNotas.Count > 0)
+                {
+                    foreach (var nota in Model.listNotas.OrderByDescending(x=>x.FechaCreacion))
+                    {
+                        <tr>
+                            <td class="filas-tablas">@nota.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="filas-tablas">@nota.UsuarioPkNavigation?.Nombre</td>
+                            <td class="filas-tablas">@nota.Nota</td>
+                            <td class="filas-tablas">
+                                <i class="icon fa-solid fa-pen-to-square" onclick="cargarPartialEnModal('modalLg', '@($"/Encargos/GetCreateEditNotaEncargo?NotasEncargo_PK={nota.NotasSiniestroPk}&Siniestro_PK={Model.Encargo_PK}")', 'modalLgBody')"></i>
+                                <i class="icon fa-solid fa-trash ml-2" onclick="eliminarNota(@nota.NotasSiniestroPk)"></i>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">No hay notas registradas</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

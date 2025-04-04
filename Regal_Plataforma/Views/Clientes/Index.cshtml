@@ -1,0 +1,310 @@
+﻿@model VM_GestionClientes
+
+<div class="container">
+    <h3 class="text-center mb-lg-3 titulo-filtro">Listado de Clientes</h3>
+
+    <!-- Buscador -->
+    <div class="search-container">
+        <input type="text" id="searchInput" class="form-control mb-3 search-encargos" placeholder="Buscar cliente...">
+    </div>
+
+    <!-- Botón para crear cliente -->
+    <div class="btn-container my-lg-3 text-center">
+        <button class="btn filter-btn" onclick="cargarPartialEnModal('modalLg', '/Clientes/GetCreateEdit', 'modalLgBody')">
+            <i class="fa-solid fa-user-plus mr-1"></i> Nuevo Cliente
+        </button>
+    </div>
+
+    <!-- Contenedor de cards -->
+    <div class="card-container">
+        @foreach (var cliente in Model.listClientes)
+        {
+            <div class="card card-custom" data-nombre="@cliente.Nombre.ToLower()" onclick="cargarPartialEnModal('modalLg', '@($"/Clientes/GetCreateEdit?Cliente_PK={cliente.ClientePk}")', 'modalLgBody')">
+                <div class="card-content">
+                    <div class="card-header card-header-obras">
+                        <span><strong>Cliente:</strong> @cliente.Nombre</span>
+                        <div class="btn-obras-header">
+                            <button type="button"
+                                    class="btn btn-sm"
+                                    onclick="event.stopPropagation(); cargarPartialEnModal('modalLg', '@($"/Clientes/GetNotasCliente?Cliente_PK={cliente.ClientePk}")', 'modalLgBody')">
+                                <i class="fa-solid fa-note-sticky"></i> Ver Notas
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Teléfono:</strong>
+                            <span class="card-encargos text-truncate">@cliente.Telefono</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Correo:</strong>
+                            <span class="card-encargos text-truncate">@cliente.Correo</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong class="card-enunciados">Tipo:</strong>
+                            <span class="card-encargos">@cliente.TipoClientePkNavigation?.Nombre</span>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-md-8">
+                            <strong class="card-enunciados">Dirección:</strong>
+                            <span class="card-encargos text-truncate">@cliente.DireccionPkNavigation?.NombreVia</span>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); eliminarCliente(@cliente.ClientePk)">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <i class="fa-solid fa-circle-up fa-beat fa-2xl" id="btnScrollTop" onclick="scrollToTop()"></i>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#searchInput").on("keyup", function () {
+                const value = $(this).val().toLowerCase();
+                $(".card-custom").each(function () {
+                    const nombre = $(this).data("nombre");
+                    $(this).toggle(nombre.includes(value));
+                });
+            });
+
+            // Mostrar u ocultar el botón según el scroll
+            window.addEventListener("scroll", function ()
+            {
+                var btn = document.getElementById("btnScrollTop");
+                // Si hace scroll
+                if (window.scrollY > 100) { // Umbral: 100px
+                    btn.style.display = "block";
+                }
+                else
+                {
+                    btn.style.display = "none";
+                }
+                // Si la distancia del final es menor a 100 píxeles, establece bottom a 8%
+                if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight)
+                {
+                    btn.style.marginBottom = '2%';
+                }
+                else
+                {
+                    btn.style.marginBottom = '1%';
+                }
+            });
+        });
+
+        function editarCliente(Cliente_Pk) {
+            $.ajax({
+                url: "/Clientes/GetEdit",
+                method: 'GET',
+                data: { Cliente_Pk: Cliente_Pk },
+                success: function (html) {
+                    $(`#modalLgBody`).html(html.partial);
+                    $(`#modalLg`).modal('show');
+                },
+                error: function (xhr) {
+                    console.error("Error al cargar partial:", xhr.responseText);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "No se pudo cargar el contenido."
+                    });
+                }
+            });
+        }
+
+        function eliminarCliente(Cliente_Pk) {
+            Swal.fire({
+                title: "¿Estás seguro de eliminar este cliente?",
+                text: "No podrás revertir esta acción",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Eliminar",
+                cancelButtonText:"Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Clientes")', // Asegúrate de que la ruta es correcta
+                        type: 'POST',
+                        data: { Cliente_Pk: Cliente_Pk},
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === "OK") {
+                                // Actualiza el contenido de la partial view del encargo
+                                $(".notasEncargo").html(response.partial);
+                                Swal.fire({
+                                    timer: 1500,
+                                    title: "Eliminada",
+                                    text: "El cliente ha sido eliminado",
+                                    icon: "success"
+                                });
+                            } else {
+                                Swal.fire({
+                                    timer: 1500,
+                                    icon: "error",
+                                    title: "ERROR",
+                                    text: response.message,
+                                    footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                timer: 1500,
+                                icon: "error",
+                                title: "ERROR",
+                                text: "El cliente no ha sido eliminado",
+                                footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function guardarCliente() {
+            // Verifica si el formulario es válido antes de hacer submit
+            if (!$("#formCliente").valid()) {
+                return;
+            }
+
+            let formData = $("#formCliente").serialize();
+
+            $.ajax({
+                url: '/Clientes/Guardar',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status === "OK") {
+                        $('#modalGeneral').modal('hide');
+                        Swal.fire ({
+                            title: 'Correcto',
+                            text: 'Cliente guardado con éxito.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload(); // Recarga para actualizar lista
+                        });
+                    } 
+                    else 
+                    {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error actualizando cliente'
+                    });
+                }
+            });
+        }
+        
+        function crearNota(Cliente_PK) {
+            let formData = $("#formNotaCliente").serialize();
+
+            $.ajax({
+                url: '@Url.Action("CreateEditNotaCliente", "Clientes")', // Asegúrate de que la ruta es correcta
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.status === "OK") {
+                        swal.fire({
+                            timer: 1500,
+                            title: "CORRECTO",
+                            text: "La nota ha sido creada",
+                            icon: "success"
+                        });
+
+                        cargarPartialEnModal('modalLg', '/Clientes/GetNotasCliente?Cliente_PK=' + Cliente_PK, 'modalLgBody');
+                    } else {
+                        Swal.fire({
+                            timer: 1500,
+                            icon: "error",
+                            title: "ERROR",
+                            text: response.message,
+                            footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        timer: 1500,
+                        icon: "error",
+                        title: "ERROR",
+                        text: "Error creando nota",
+                        footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                    });
+                }
+            });
+        }
+
+        // Eliminar nota vía AJAX
+        function eliminarNota(NotasObra_PK, Cliente_PK) {
+            Swal.fire({
+                title: "¿Estás seguro de eliminar esta nota?",
+                text: "No podrás revertir esta acción",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Eliminar",
+                cancelButtonText:"Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("DeleteNotaCliente", "Clientes")', // Asegúrate de que la ruta es correcta
+                        type: 'POST',
+                        data: { NotasObra_PK: NotasObra_PK, Cliente_PK: Cliente_PK },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === "OK") {
+                                Swal.fire({
+                                    timer: 1500,
+                                    title: "Eliminada",
+                                    text: "La nota ha sido eliminada",
+                                    icon: "success"
+                                });
+
+                                cargarPartialEnModal('modalLg', '/Clientes/GetNotasCliente?Cliente_PK=' + Cliente_PK, 'modalLgBody');
+                            } else {
+                                Swal.fire({
+                                    timer: 1500,
+                                    icon: "error",
+                                    title: "ERROR",
+                                    text: response.message,
+                                    footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                timer: 1500,
+                                icon: "error",
+                                title: "ERROR",
+                                text: "La nota ha sido eliminada",
+                                footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+    </script>
+}
+

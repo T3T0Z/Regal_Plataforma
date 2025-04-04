@@ -1,0 +1,41 @@
+﻿@model VM_NotasCliente;
+
+<table class="table table-striped tabla-notas align-middle">
+    <thead class="thead-notas">
+        <tr class="filas-tablasfilas-tablas-titulo">
+            <th class="col-fecha filas-tablas-titulo">Fecha</th>
+            <th class="col-usuario filas-tablas-titulo">Usuario</th>
+            <th class="filas-tablas-titulo">Nota</th>
+            <th class="filas-tablas-titulo col-acciones">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.listNotas.Count > 0)
+        {
+            foreach (var nota in Model.listNotas.OrderByDescending(x => x.FechaCreacion))
+            {
+                <tr>
+                    <td class="filas-tablas">@nota.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="filas-tablas">@nota.UsuarioPkNavigation?.Nombre</td>
+                    <td class="filas-tablas">@nota.Nota</td>
+                    <td class="filas-tablas">
+                        <i class="icon fa-solid fa-pen-to-square" onclick="cargarPartialEnModal('modalLg', '@($"/Clientes/GetCreateEditNotaCliente?NotasCliente_PK={nota.NotasClientesPk}")', 'modalLgBody')"></i>
+                        <i class="icon fa-solid fa-trash ml-2" onclick="eliminarNota(@nota.NotasClientesPk, @nota.ClientePk)"></i>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center text-muted">No hay notas registradas</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Se añade onclick="event.stopPropagation()" para que al interactuar con este bloque no se dispare el toggle -->
+<div class="modal-footer">
+    <button type="button" class="btn my-0" data-dismiss="modal">Cerrar</button>
+    <button class="btn" onclick="cargarPartialEnModal('modalLg', '@($"/Clientes/GetCreateEditNotaCliente?Cliente_PK={Model.Cliente_PK}")', 'modalLgBody')">Nueva Nota</button>
+</div>

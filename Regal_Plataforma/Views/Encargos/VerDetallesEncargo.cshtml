@@ -1,0 +1,213 @@
+﻿@model VM_VerDetallesEncargo;
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-2"></div>
+        <h3 class="text-center col-8">Detalles del Encargo <span style="color:red;">@Model.OrderDatos.SiniestroPkNavigation.DetallesSiniestroPkNavigation.NumeroSiniestro</span> </h3>
+        <div class="col-2"></div>
+    </div>
+    <div class="detallesEncargo">
+        <partial name="~/Views/Shared/PartialViews/_detallesEncargo.cshtml" model="@Model" />
+    </div>
+    <div class="notasEncargo">
+        <partial name="~/Views/Shared/PartialViews/_notasEncargo.cshtml" model="@Model.Notas" />
+    </div>
+    <button class="btnBack btn" onclick="window.location.href='/Encargos/Index'">
+        Volver a mis encargos
+    </button>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $(".selectGremioEncargo").on("change", function(){
+                cambiarGremio();
+            });
+            $('#createNotaModal').on('show.bs.modal', function () {
+                // Limpia el contenido del textarea dentro del modal
+                $(this).find('textarea#textoNota').val('');
+            });
+        });
+        function cambiarGremio() {
+            var gremioPk = $(".selectGremioEncargo").val();
+            var encargoPk = $(".selectGremioEncargo").data("encargopk");
+
+            $.ajax({
+                url: '@Url.Action("ActualizarGremioEncargo", "Gestion")',  // Ajusta el nombre del controlador si es necesario
+                type: 'POST',
+                dataType: 'json',
+                data: { OrderDatosPK: encargoPk, GremioPK: gremioPk },
+                success: function(response) {
+                    if (response.status === "OK") {
+                        // Actualiza el contenido de la partial view del encargo
+                        $(".detallesEncargo").html(response.partial);
+                        Swal.fire({
+                            timer: 1500,
+                            title: "CORRECTO",
+                            text: "El gremio ha sido actualizado",
+                            icon: "success"
+                        });
+                    }
+                    else {
+                        // En caso de KO, actualiza el body del modal con el mensaje y lo muestra
+                        $(".detallesEncargo").html(response.partial);
+                        Swal.fire({
+                            timer: 1500,
+                            icon: "error",
+                            title: "ERROR",
+                            text: response.message,
+                            footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        timer: 1500,
+                        icon: "error",
+                        title: "ERROR",
+                        text: "Error actualizando el gremio del encargo",
+                        footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                    });
+                }
+            });
+        }
+
+        // Crear nota vía AJAX
+        function crearNota() {
+            let formData = $("#formNotaEncargo").serialize();
+
+            $.ajax({
+                url: '@Url.Action("CreateEditNotaEncargo", "Encargos")', // Asegúrate de que la ruta es correcta
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.status === "OK") {
+                        // Actualiza el contenido de la partial view del encargo
+                        $(".notasEncargo").html(response.partial);
+                        // Cierra correctamente la modal con boton
+                        document.querySelector('#modalLg .cerrar-modal').click();
+                        
+                        swal.fire({
+                            timer: 1500,
+                            title: "CORRECTO",
+                            text: "La nota ha sido creada",
+                            icon: "success"
+                        });
+                    } else {
+                        Swal.fire({
+                            timer: 1500,
+                            icon: "error",
+                            title: "ERROR",
+                            text: response.message,
+                            footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        timer: 1500,
+                        icon: "error",
+                        title: "ERROR",
+                        text: "Error creando nota",
+                        footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                    });
+                }
+            });
+        }
+        // Eliminar nota vía AJAX
+        function eliminarNota(NotasSiniestro_PK) {
+            Swal.fire({
+                title: "¿Estás seguro de eliminar esta nota?",
+                text: "No podrás revertir esta acción",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Eliminar",
+                cancelButtonText:"Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("DeleteNotaEncargo", "Encargos")', // Asegúrate de que la ruta es correcta
+                        type: 'POST',
+                        data: { NotasSiniestro_PK: NotasSiniestro_PK, Siniestro_PK: @Model.OrderDatos.OrderDatosPk },
+                        success: function(response) {
+                            if (response.status === "OK") {
+                                // Actualiza el contenido de la partial view del encargo
+                                $(".notasEncargo").html(response.partial);
+                                Swal.fire({
+                                    timer: 1500,
+                                    title: "Eliminada",
+                                    text: "La nota ha sido eliminada",
+                                    icon: "success"
+                                });
+                            } else {
+                                Swal.fire({
+                                    timer: 1500,
+                                    icon: "error",
+                                    title: "ERROR",
+                                    text: response.message,
+                                    footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                timer: 1500,
+                                icon: "error",
+                                title: "ERROR",
+                                text: "La nota ha sido eliminada",
+                                footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function toggleEncargoBody() {
+            const body = document.getElementById("encargoBody");
+
+            if (body.style.display === "none" || body.classList.contains("d-none")) {
+                body.style.display = "block";
+                body.classList.remove("d-none");
+            } else {
+                body.style.display = "none";
+                body.classList.add("d-none");
+            }
+        }
+
+        function toggleNotasEncargoBody() {
+            const body = document.getElementById("notasencargoBody");
+
+            if (body.style.display === "none" || body.classList.contains("d-none")) {
+                body.style.display = "block";
+                body.classList.remove("d-none");
+            } else {
+                body.style.display = "none";
+                body.classList.add("d-none");
+            }
+        }
+
+        function copiarSiniestro() {
+            const texto = document.getElementById("numeroSiniestro").innerText;
+
+            navigator.clipboard.writeText(texto).then(() => {
+                // Opcional: mostrar aviso visual
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Copiado',
+                    text: 'Número de siniestro copiado al portapapeles',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }).catch(err => {
+                Swal.fire({
+                    timer: 1500,
+                    icon: "error",
+                    title: "ERROR",
+                    text: "Error copiando numero de siniestro",
+                    footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                });
+            });
+        }
+    </script>
+}

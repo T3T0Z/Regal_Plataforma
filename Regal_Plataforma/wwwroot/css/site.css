@@ -1,0 +1,581 @@
+/*HEADER*/
+/* Estilos para el header */
+/*BOTONES*/
+.btn {
+    border: 2px solid #27436e;
+    background: transparent;
+    color: #27436e;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+}
+
+    .btn:hover,
+    .btn.active,
+    .btn:focus,
+    .btn:active:focus,
+    .btn-link.nav-link:focus {
+        background-color: #27436e !important;
+        color: white;
+        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #27436e !important;
+    }
+
+/*FORMULARIO*/
+input.form-control,
+select.form-control,
+textarea.form-control {
+    border: 2px solid #27436e;
+    background: transparent;
+    color: #27436e;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+}
+
+    input.form-control:focus,
+    select.form-control:focus,
+    textarea.form-control:focus {
+        background-color: #27436e !important;
+        color: white;
+        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #27436e !important;
+    }
+
+label {
+    font-size: 14px;
+    color: #27436e;
+}
+
+.error {
+    color: red;
+    padding-top: 1px;
+    font-size: 12px;
+}
+
+/*CARD OBRAS*/
+.card-header-obras {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0px;
+}
+
+.btn-obras-header {
+    display: flex;
+}
+
+
+
+
+
+
+
+
+
+.modal-regal {
+    border-radius: 16px;
+    background-color: #f8f9fa;
+    border: 2px solid #27436e;
+    box-shadow: 0 0 25px rgba(39, 67, 110, 0.25);
+    overflow: hidden;
+}
+
+    .modal-regal .modal-header {
+        background-color: #27436e;
+        color: white;
+        border-bottom: 1px solid #ddd;
+        padding: 0.8rem 1.2rem;
+    }
+
+    .modal-regal .modal-title {
+        font-weight: 600;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .modal-regal .modal-body {
+        padding: 1.25rem;
+        min-height: 100px;
+    }
+    .modal-regal .modal-footer {
+        padding-bottom: 0px;
+        padding-top: 1rem;
+    }
+    
+
+.modal-header-custom {
+    display: flex;
+    align-items: center; /* Centrado vertical */
+    justify-content: center; /* Centra el título */
+    padding: 0.75rem 1.25rem;
+    position: relative;
+    background-color: #27436e;
+    color: white;
+}
+
+.modal-header-custom .cerrar-modal {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+    color: white;
+}
+
+    .modal-header-custom .cerrar-modal:hover {
+        transform: translateY(-50%) scale(1.2) rotate(90deg);
+        color: #ffdddd;
+    }
+
+/* ---------- GENERAL FORMS ---------- */
+
+button.btn-primary {
+    background-color: #27436e;
+    border-color: #27436e;
+}
+
+    button.btn-primary:hover {
+        background-color: #1d3554;
+        border-color: #1d3554;
+    }
+
+.text-end {
+    text-align: right;
+}
+
+
+/*.custom-modal.modal-xs {
+    max-width: 350px;
+}
+
+.custom-modal.modal-sm {
+    max-width: 500px;
+}
+
+.custom-modal.modal-md {
+    max-width: 700px;
+}
+
+.custom-modal.modal-lg {
+    max-width: 1000px;
+}
+
+
+.custom-modal.modal-xs {
+    max-width: 320px;
+}
+
+.custom-modal.modal-sm {
+    max-width: 450px;
+}
+
+.custom-modal.modal-md {
+    max-width: 650px;
+}
+
+.custom-modal.modal-lg {
+    max-width: 900px;
+}*/
+
+
+/*Ejemplo de estilos existentes*/ 
+
+
+.icon {
+    color: #27436e;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+}
+    .icon:hover,
+    .icon.active,
+    .icon:focus,
+    .icon:active:focus,
+    .icon.nav-link:focus {
+        color: #3b5b90;
+    }
+
+/* Aseguramos que html y body ocupen el 100% de la altura */
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100vh; /* Altura mínima de la ventana */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* El header y el footer ocupan solo el espacio que necesitan */
+header, footer {
+    flex: 0 0 auto;
+}
+
+/* El main se expande para ocupar el espacio restante */
+main {
+    flex: 1 0 auto;
+}
+
+.logo-layout {
+    height: 70px;
+}
+
+/*LOGIN*/
+.login-container {
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.no-click {
+    cursor: default;
+    user-select: none;
+}
+
+/*LISTADO ENCARGOS*/
+.action-btn {
+    border: none;
+    background-color: transparent;
+}
+    .action-btn:focus,
+    .action-btn:active {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.card-header {
+    border-bottom: 2px solid #27436e;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #27436e;
+    font-size: 1.1rem;
+    background-color: #f5f6f7;
+}
+
+/* Textos */
+.card-enunciados {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+/* Ajustes de card si aún no los tienes */
+.card-custom {
+    background-color: #f5f6f7;
+    box-shadow: 2px 2px 6px rgba(27, 64, 106, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+    position: relative;
+}
+
+.card-enunciados {
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 14px;
+}
+
+.card-encargos{
+    color: #333;
+    font-weight: 400;
+    font-size: 13px;
+}
+
+.card-content {
+    flex-grow: 1;
+}
+
+.btn-group-custom {
+    position: absolute;
+    right: 15px;
+    top: 60%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+.btn-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite ajustar los botones en varias líneas si es necesario */
+    justify-content: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-flex;
+    max-width: 88%; /* ajusta según tus necesidades */
+}
+
+/* Botón de subir */
+#btnScrollTop {
+    position: fixed;
+    bottom: 1%; /* Valor por defecto */
+    right: 7%;
+    cursor: pointer;
+    display: none;
+    z-index: 1000;
+    transition: bottom 0.3s ease, opacity 0.3s ease;
+    color: #27436e;
+}
+
+/*DETALLES ENCARGO*/
+/* Botón de subir */
+.btnBack {
+    position: fixed;
+    bottom: 5%;
+    left: 2%;
+    z-index: 1000;
+}
+
+.encargo-container {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+.encargo-header {
+    background-color: #dc3545; /* Banda roja */
+    border-start-end-radius: 5px;
+    border-start-start-radius: 5px;
+    color: #fff;
+    padding-right: 15px;
+    padding-left: 15px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* Grupo izquierdo: Título y toggles */
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Grupo derecho: Label y select */
+.header-right {
+    display: flex;
+    align-items: center;
+    cursor: auto;
+}
+    .header-right label {
+        margin-top: 5px;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+.select-gremio {
+    background: transparent;
+    border: 1px solid #fff;
+    border-radius: 3px;
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 16px;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+    .select-gremio:hover, .select-gremio:focus, .select-gremio:active:focus, .select-gremio.nav-link:focus {
+        background-color: white !important;
+        color: black;
+        box-shadow: 0 0 0 0.1rem black, 0 0 0 0.25rem white !important;
+    }
+    .select-gremio option {
+        color: #000;
+    }
+
+.btn-crearnota {
+    background: transparent;
+    border: 1px solid #fff;
+    border-radius: 3px;
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 16px;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+    .btn-crearnota:hover, .btn-crearnota:focus, .btn-crearnota:active:focus, .btn-crearnota.nav-link:focus {
+        background-color: white !important;
+        color: black;
+        box-shadow: 0 0 0 0.1rem black, 0 0 0 0.25rem white !important;
+    }
+
+.nro-siniestro-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-copiar {
+    background-color: transparent;
+    border: none;
+    color: #27436e;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+}
+    .btn-copiar:hover {
+        color: #3b5b90;
+    }
+
+/* Cuerpo principal (contenido) */
+.encargo-body {
+    padding: 15px;
+}
+
+/* Línea contenedora de dos columnas */
+.info-line {
+    display: flex;
+    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
+}
+
+/* Columna al 50% */
+.info-col {
+    flex: 0 0 33%;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+/* Título de sección subrayado */
+.section-title {
+    margin-top: 3%;
+    font-weight: bolder;
+    font-family: 'Sans Serif Collection';
+    font-style: normal;
+    margin-bottom: 2px;
+    font-size: 20px;
+}
+
+/* Etiquetas en negrita */
+.info-label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+/* Línea divisoria */
+.line-separator {
+    border-top: 2px solid #dc3545;
+    margin-bottom: 15px;
+}
+
+/*NOTAS*/
+/* Contenedor de la tarjeta de notas */
+.card-notas {
+    border: 1px solid #ccc;
+}
+
+/* Encabezado de la tarjeta */
+.header-notas {
+    border-start-end-radius: 5px;
+    border-start-start-radius: 5px;
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Cuerpo de la tarjeta */
+.body-notas {
+    padding: 15px;
+}
+/* Cabecera de tabla con fondo oscuro */
+.thead-notas {
+    background-color: #27436e;
+    color: white;
+    font-weight: bold;
+}
+
+/* Bordes verticales */
+.table-separada td,
+.table-separada th {
+    border-right: 2px solid black;
+}
+    /* Elimina el borde del último td/th */
+    .table-separada td:last-child,
+    .table-separada th:last-child {
+        border-right: none;
+    }
+
+/* Columnas que no deben crecer de más */
+.col-fecha,
+.col-acciones, 
+.col-usuario {
+    white-space: nowrap;
+}
+.col-fecha {
+    width: 13%;
+}
+.col-usuario {
+    width: 5%;
+}
+.col-acciones {
+    width: 5%;
+}
+
+/* Estilo general */
+.tabla-notas {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+/* Modales para notas */
+.modal-notas {
+    border-radius: 10px;
+    /* Puedes añadir más estilos si deseas */
+}
+
+/* Encabezado del modal */
+.header-modal-notas {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Cuerpo del modal */
+.body-modal-notas {
+    padding: 20px;
+}
+
+/* Footer del modal */
+.footer-modal-notas {
+    display: flex;
+    justify-content: flex-end;
+}

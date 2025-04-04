@@ -1,0 +1,50 @@
+﻿@model VM_DetallesUsuario;
+
+<div class="encargo-container">
+    <div class="encargo-header">
+        <span class="header-title">Información General</span>
+    </div>
+
+    <div class="encargo-body">
+        <div class="info-line">
+            <div class="info-col">
+                <span class="info-label">Usuario:</span>
+                <span>@Model.Usuario.Usuario1</span>
+            </div>
+            <div class="info-col">
+                <span class="info-label">Nombre:</span>
+                <span>@Model.Usuario.Nombre</span>
+            </div>
+            <div class="info-col">
+                <span class="info-label">Apellidos:</span>
+                <span>@Model.Usuario.Apellidos</span>
+            </div>
+        </div>
+
+        <div class="info-line">
+            <div class="info-col">
+                <span class="info-label">Rol:</span>
+                <span>@Model.Usuario.RolPkNavigation?.Rol</span>
+            </div>
+            <div class="info-col">
+                <span class="info-label">Fecha Creación:</span>
+                <span>@Model.Usuario.FechaCreacion.ToString("dd/MM/yyyy")</span>
+            </div>
+        </div>
+
+        <div class="info-line">
+            <div class="info-col">
+                <span class="info-label">Gestor:</span>
+                <span>@(Model.Usuario.Gestor ? "Sí" : "No")</span>
+            </div>
+            <div class="info-col">
+                <span class="info-label">Operario:</span>
+                <span>@(Model.Usuario.Operario ? "Sí" : "No")</span>
+            </div>
+            <div class="info-col">
+                <span class="info-label">Externo:</span>
+                <span>@(Model.Usuario.Externo ? "Sí" : "No")</span>
+            </div>
+        </div>
+    </div>
+</div>

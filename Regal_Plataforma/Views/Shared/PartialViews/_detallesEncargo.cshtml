@@ -1,0 +1,157 @@
+﻿@model VM_VerDetallesEncargo;
+
+<div class="encargo-container">
+    <div class="encargo-header" onclick="toggleEncargoBody()">
+        <div class="header-left">
+            <span class="header-title" id="InfoGeneralEncargos">Información General del Encargo</span>
+        </div>
+        <!-- Se añade onclick="event.stopPropagation()" para que al interactuar con este bloque no se dispare el toggle -->
+        <div class="header-right" onclick="event.stopPropagation()">
+            <label for="selectGremioEncargo">Gremio:</label>
+            <select name="selectGremioEncargo" class="select-gremio selectGremioEncargo" data-encargopk="@Model.OrderDatos.OrderDatosPk">
+                <option value="@Model.OrderDatos.GremioPk" selected>@Model.OrderDatos.GremioPkNavigation.Nombre</option>
+                @foreach (var gremio in Model.listGremios.Where(x => x.GremioPk != Model.OrderDatos.GremioPk))
+                {
+                    <option value="@gremio.GremioPk">@gremio.Nombre</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="encargo-body" id="encargoBody">
+
+        @* SINIESTRO *@
+        <div class="section-title mt-0">Siniestro</div>
+        <div class="line-separator"></div>
+
+        <div class="info-line">
+            <div class="info-col">
+                <span class="info-label">Nº Siniestro:</span>
+                <span id="numeroSiniestro">@Model.OrderDatos.SiniestroPkNavigation.DetallesSiniestroPkNavigation.NumeroSiniestro</span>
+                <button class="btn-copiar" onclick="copiarSiniestro()" title="Copiar al portapapeles">
+                    <i class="fa-solid fa-copy"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="info-line">
+            <div class="info-col" style="flex: 0 0 100%">
+                <span class="info-label">Descripción:</span>
+                <span>@Model.OrderDatos.SiniestroPkNavigation.DetallesSiniestroPkNavigation.Descripcion</span>
+            </div>
+        </div>
+
+        @* DOMICILIO ASEGURADO *@
+        <div class="section-title">Domicilio Asegurado</div>
+        <div class="line-separator"></div>
+
+        @if (Model.OrderDatos.PaseguradoPkNavigation.DireccionPkNavigation != null)
+        {
+            <div class="info-line">
+                <div class="info-col">
+                    <span class="info-label">Dirección:</span>
+                    <span>@Model.OrderDatos.PaseguradoPkNavigation.DireccionPkNavigation.NombreVia</span>
+                </div>
+                <div class="info-col">
+                    <span class="info-label">Población:</span>
+                    <span>@Model.OrderDatos.PaseguradoPkNavigation.DireccionPkNavigation.Poblacion</span>
+                </div>
+                <div class="info-col">
+                    <span class="info-label">Codigo Postal:</span>
+                    <span>@Model.OrderDatos.PaseguradoPkNavigation.DireccionPkNavigation.CodigoPostal</span>
+                </div>
+            </div>
+        }
+
+        @* ASEGURADO *@
+        <div class="section-title">Asegurado</div>
+        <div class="line-separator"></div>
+
+        @if (Model.OrderDatos.PaseguradoPkNavigation != null)
+        {
+            <div class="info-line">
+                <div class="info-col">
+                    <span class="info-label">Asegurado:</span>
+                    <span>@Model.OrderDatos.PaseguradoPkNavigation.Nombre</span>
+                </div>
+                <div class="info-col">
+                    <span class="info-label">NIF/CIF:</span>
+                    <span>@Model.OrderDatos.PaseguradoPkNavigation.CarneIdentidad</span>
+                </div>
+                <div class="info-col">
+                    <span class="info-label">Movil:</span>
+                    <span>@Model.OrderDatos.PaseguradoPkNavigation.NumeroTelefonoPkNavigation?.NumeroTelefono</span>
+                </div>
+            </div>
+
+            <div class="info-line">
+                <div class="info-col">
+                    <span class="info-label">Telefono:</span>
+                    <span>@Model.OrderDatos.PaseguradoPkNavigation.NumeroTelefono2PkNavigation?.NumeroTelefono</span>
+                </div>
+                <div class="info-col">
+                    <span class="info-label">Descripción Actividad:</span>
+                    <span>REMPLAZAR</span>
+                </div>
+            </div>
+        }
+
+        @* POLIZA *@
+        <div class="section-title">Poliza</div>
+        <div class="line-separator"></div>
+
+        @if (Model.OrderDatos.SiniestroPkNavigation.DetallesSiniestroPkNavigation != null)
+        {
+            <div class="info-line">
+                <div class="info-col">
+                    <span class="info-label">Nº Poliza:</span>
+                    <span>@Model.OrderDatos.SiniestroPkNavigation.DetallesSiniestroPkNavigation.NumeroPoliza</span>
+                </div>
+                <div class="info-col">
+                    <span class="info-label">Fecha Efcto:</span>
+                    <span>
+                        @(Model.OrderDatos.SiniestroPkNavigation.DetallesSiniestroPkNavigation.FechaEfecto.HasValue == true ? Model.OrderDatos.SiniestroPkNavigation.DetallesSiniestroPkNavigation.FechaEfecto.Value.Day : "")
+                    </span>
+                </div>
+                <div class="info-col">
+                    <span class="info-label">Fecha Ult Apendice:</span>
+                    <span>@Model.OrderDatos.SiniestroPkNavigation.DetallesSiniestroPkNavigation.FechaApendice.Value.Date</span>
+                </div>
+            </div>
+        }
+
+        @* TERCEROS *@
+        <div class="section-title">Terceros</div>
+        <div class="line-separator"></div>
+
+        @if (Model.OrderDatos.PafectadaPkNavigation != null)
+        {
+            <div class="info-line">
+                <div class="info-col">
+                    <span class="info-label">Tipo Persona:</span>
+                    <span>@Model.OrderDatos.PafectadaPkNavigation.TipoPersona</span>
+                </div>
+                <div class="info-col">
+                    <span class="info-label">Nombre:</span>
+                    <span>@Model.OrderDatos.PafectadaPkNavigation.Nombre</span>
+                </div>
+                <div class="info-col">
+                    <span class="info-label">Direccion:</span>
+                    <span>@Model.OrderDatos.PafectadaPkNavigation.DireccionPkNavigation?.NombreVia</span>
+                </div>
+            </div>
+
+            <div class="info-line">
+                <div class="info-col">
+                    <span class="info-label">Tlfn:</span>
+                    <span>@Model.OrderDatos.PafectadaPkNavigation.NumeroTelefonoPkNavigation?.NumeroTelefono</span>
+                </div>
+                <div class="info-col">
+                    <span class="info-label">Daños:</span>
+                    <span>REMPLAZAR</span>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>

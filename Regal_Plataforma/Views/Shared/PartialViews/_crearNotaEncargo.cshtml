@@ -1,0 +1,17 @@
+﻿@model VM_NotasEncargo;
+<h5 class="modal-title" id="createNotaLabel">Nueva Nota</h5>
+<div class="modal-body">
+    <form id="formNotaEncargo">
+        @Html.HiddenFor(x => x.Nota.NotasSiniestroPk)
+        @Html.HiddenFor(x => x.Nota.SiniestroPk)
+        @Html.HiddenFor(x => x.Nota.UsuarioPk)
+        <div class="mb-3">
+            <label for="textoNota" class="form-label">Nota</label>
+            @Html.TextAreaFor(x => x.Nota.Nota, new { @class = "form-control", id = "textoNota", rows = "3" })
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn" data-dismiss="modal">Cerrar</button>
+    <button type="button" class="btn" onclick="crearNota()">Guardar</button>
+</div>

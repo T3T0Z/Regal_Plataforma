@@ -1,0 +1,140 @@
+﻿@model VM_CreateUpdateObra
+
+<form id="formObra">
+    @Html.HiddenFor(x => x.Obra.ObraPk)
+
+    <div class="form-group mb-3">
+        <label>Nombre de la Obra</label>
+        @Html.TextBoxFor(x => x.Obra.Nombre, new { @class = "form-control" })
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 form-group mb-3">
+            <label for="ClientePk">Cliente</label>
+            @Html.DropDownListFor(x => x.Obra.ClientePk,
+                     new SelectList(Model.listClientes, "ClientePk", "Nombre"),
+                     "Seleccione un cliente",
+                     new { @class = "form-control selectpicker", @data_live_search = "true" })
+        </div>
+
+        <div class="col-md-4 form-group mb-3">
+            <label for="EstadoObraPk">Estado</label>
+            @Html.DropDownListFor(x => x.Obra.EstadoObraPk,
+                     new SelectList(Model.listEstadosObras, "EstadoObrasPk", "Estado"),
+                     "Seleccione un gestor",
+                     new { @class = "form-control selectpicker", @data_live_search = "true" })
+        </div>
+
+        <div class="col-md-4 form-group mb-3">
+            <label for="EstadoObraPk">Gestor</label>
+            @Html.DropDownListFor(x => x.Obra.UgestorPk,
+                     new SelectList(Model.listaGestores, "UsuarioPk", "Nombre"),
+                     "Seleccione un estado",
+                     new { @class = "form-control selectpicker", @data_live_search = "true" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Fecha Asignada</label>
+            @Html.TextBoxFor(x => x.Obra.FechaAsignada, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control" })
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>Fecha Fin Asignada</label>
+            @Html.TextBoxFor(x => x.Obra.FechaFinAsignada, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Fecha Inicio (real)</label>
+            @Html.TextBoxFor(x => x.Obra.Fecha, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control" })
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>Fecha Fin (real)</label>
+            @Html.TextBoxFor(x => x.Obra.FechaFin, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control" })
+        </div>
+    </div>
+
+    @* Dirección *@
+    <div class="row">
+        <div class="col-md-9 mb-3">
+            <label>Dirección</label>
+            @Html.TextBoxFor(x => x.Obra.DireccionPkNavigation.NombreVia, new { @class = "form-control" })
+        </div>
+        <div class="col-md-3 mb-3">
+            <label>Código Postal</label>
+            @Html.TextBoxFor(x => x.Obra.DireccionPkNavigation.CodigoPostal, new { @class = "form-control", data_inputmask = "'mask': '99999'" })
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button type="button" class="btn filter-btn" onclick="guardarObra()">Guardar</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+        $(":input").inputmask();
+
+        $("#formObra").validate({
+            rules: {
+                "Obra.Nombre": {
+                    required: true
+                },
+                "Obra.ClientePk": {
+                    required: true
+                },
+                "Obra.UgestorPk": {
+                    required: true
+                },
+                "Obra.EstadoObraPk": {
+                    required: true
+                },
+                "Obra.FechaAsignada": {
+                    required: true
+                },
+                "Obra.FechaFinAsignada": {
+                    required: true
+                },
+                "Obra.DireccionPkNavigation.NombreVia": {
+                    required: true
+                },
+                "Obra.DireccionPkNavigation.CodigoPostal": {
+                    required: true,
+                    minlength: 5,
+                    maxlength: 5
+                }
+            },
+            messages: {
+                    "Obra.Nombre": {
+                        required: "El nombre es obligatorio"
+                    },
+                    "Obra.ClientePk": {
+                        required: "El cliente es obligatorio",
+                    },
+                    "Obra.UgestorPk": {
+                        required: "El gestor es obligatorio",
+                    },
+                    "Obra.EstadoObraPk": {
+                        required: "El estado es obligatorio",
+                    },
+                    "Obra.FechaAsignada": {
+                        required: "La fecha asignada es obligatoria"
+                    },
+                    "Obra.FechaFinAsignada": {
+                        required: "La fecha fin asignada es obligatoria"
+                    },
+                    "Obra.DireccionPkNavigation.NombreVia": {
+                        required: "La direccion es obligatoria"
+                    },
+                    "Obra.DireccionPkNavigation.CodigoPostal": {
+                        required: "El codigo postal es obligatorio",
+                        minlength: "Debe tener al menos 5 caracteres",
+                        maxlength: "Debe tener máximo 5 caracteres"
+                    }
+                }
+            });
+    });
+</script>

@@ -1,0 +1,21 @@
+﻿@model VM_DetallesUsuario;
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col text-center">
+            <h3>Detalles del Usuario <span style="color:#007bff">@Model.Usuario.Usuario1</span></h3>
+        </div>
+    </div>
+
+    <div class="detallesUsuario">
+        <partial name="~/Views/Shared/PartialViews/_detallesUsuario.cshtml" model="@Model" />
+    </div>
+
+    <div class="notasUsuario">
+        <partial name="~/Views/Shared/PartialViews/_notasUsuario.cshtml" model="@Model.Notas" />
+    </div>
+
+    <button class="btn btn-outline-secondary mt-3" onclick="window.location.href='/Usuarios/Index'">
+        Volver al listado
+    </button>
+</div>

@@ -1,0 +1,138 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "REGAL_ASISTENCIAContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Models\/BDD",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "Regal_Plataforma",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[ASIGNACION_TRABAJOS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[CLIENTES]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[DETALLES_SINIESTRO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[DIALOG]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[DIRECCION]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ESTADO_OBRAS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ESTADOS_TRABAJOS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[GREMIOS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[NOTAS_CLIENTES]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[NOTAS_OBRAS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[NOTAS_SINIESTROS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[NOTAS_TRABAJOS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[NOTAS_USUARIOS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[OBRAS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ORDER]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ORDER_DATOS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PERSONAS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ROLES]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SINIESTRO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TELEFONO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TIPOS_CLIENTES]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TIPOS_INTERVENCIONES]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TRABAJOS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[USUARIOS]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false
+}

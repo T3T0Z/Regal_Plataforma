@@ -1,9 +1,9 @@
-﻿@model VM_NotasEncargo;
+﻿@model VM_NotasUsuario;
 <h5 class="modal-title" id="createNotaLabel">Nueva Nota</h5>
 <div class="modal-body">
     <form id="formNotaEncargo">
-        @Html.HiddenFor(x => x.Nota.NotasSiniestroPk)
-        @Html.HiddenFor(x => x.Nota.SiniestroPk)
+        @Html.HiddenFor(x => x.Nota.NotasUsuarioPk)
+        @Html.HiddenFor(x => x.Nota.UcreadorPkNavigation)
         @Html.HiddenFor(x => x.Nota.UsuarioPk)
         <div class="mb-3">
             <label for="textoNota" class="form-label">Nota</label>

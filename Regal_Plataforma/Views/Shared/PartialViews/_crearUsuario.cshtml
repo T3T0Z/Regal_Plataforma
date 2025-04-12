@@ -2,34 +2,64 @@
 
 <form id="formUsuario">
     @Html.HiddenFor(m => m.Usuario.UsuarioPk)
-
-    <div class="form-group mb-2">
-        <label>Usuario</label>
-        @Html.TextBoxFor(m => m.Usuario.Usuario1, new { @class = "form-control", required = "required" })
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label>Nombre</label>
+            @Html.TextBoxFor(m => m.Usuario.Nombre, new { @class = "form-control" })
+        </div>
+        <div class="col-md-4 mb-3">
+            <label>Apellidos</label>
+            @Html.TextBoxFor(m => m.Usuario.Apellidos, new { @class = "form-control" })
+        </div>
+        <div class="col-md-4 form-group mb-3">
+            <label for="RolPk">Roles</label>
+            @Html.DropDownListFor(x => x.Usuario.RolPk,
+            new SelectList(Model.listRoles, "RolPk", "Rol"),
+                        "Seleccione un rol",
+                        new { @class = "form-control selectpicker", @data_live_search = "true" })
+        </div>
     </div>
 
-    <div class="form-group mb-2">
-        <label>Nombre</label>
-        @Html.TextBoxFor(m => m.Usuario.Nombre, new { @class = "form-control", required = "required" })
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Usuario</label>
+            @Html.TextBoxFor(m => m.Usuario.Usuario1, new { @class = "form-control" })
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>Contraseña</label>
+            @Html.TextBoxFor(m => m.Usuario.Contrasena, new { @class = "form-control" })
+        </div>
     </div>
 
-    <div class="form-group mb-2">
-        <label>Apellidos</label>
-        @Html.TextBoxFor(m => m.Usuario.Apellidos, new { @class = "form-control" })
-    </div>
-
-    <div class="form-group mb-2">
-        <label>Contraseña</label>
-        @Html.TextBoxFor(m => m.Usuario.Contrasena, new { @class = "form-control", type = "password" })
-    </div>
-
-    <div class="form-group mb-2">
-        <label>Rol</label>
-        @Html.DropDownListFor(m => m.Usuario.RolPk, new SelectList(Model.listRoles, "RolPk", "Rol"), "Seleccione un rol", new { @class = "form-control", required = "required" })
-    </div>
-
-    <div class="form-group text-end">
-        <button type="button" class="btn btn-primary" onclick="guardarUsuario()">Guardar</button>
+    <div class="modal-footer">
+        <button type="button" class="btn my-0" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn my-0" onclick="guardarUsuario()">Guardar</button>
     </div>
 </form>
 
+
+<script>
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+        $(":input").inputmask();
+
+        $("#formUsuario").validate({
+            rules: {
+                "Usuario.Nombre": {
+                    required: true
+                },
+                "Usuario.RolPk": {
+                    required: true
+                },
+            },
+            messages: {
+                "Usuario.Nombre": {
+                    required: "El nombre es obligatorio"
+                },
+                "Usuario.RolPk": {
+                    required: "El rol es obligatorio"
+                }
+            }
+        });
+    });
+</script>

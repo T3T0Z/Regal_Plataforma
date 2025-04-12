@@ -1,0 +1,127 @@
+﻿@model VM_Month;
+
+<!-- Contenedor principal de la tarjeta -->
+<div class="encargo-container">
+    <div class="encargo-header">
+        <div class="header-left">
+            <span class="header-title">Calendario de Usuario</span>
+        </div>
+    </div>
+
+    <div class="encargo-body" id="notasencargoBody">
+        <div class="month-calendar-detail">
+            <div class="calendario-header">
+                <div class="header-left">
+                    <span class="header-title">@(new DateTime(Model.Year, Model.Month, 1).ToString("MMMM yyyy").ToUpper())</span>
+                </div>
+                <div class="header-right">
+                    <button class="btn" onclick="verYear(@Model.Year, @Model.UsuarioPk)">Volver al calendario anual</button>
+                    <button class="btn mx-2" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEdit?UsuarioPk={Model.UsuarioPk}")', 'modalLgBody')">Nuevo Trabajo</button>
+                </div>
+            </div>
+
+            <table class="table table-bordered">
+                <thead>
+                    <!-- Cabecera para pantallas grandes -->
+                    <tr class="header-wide" style="display: none;">
+                        <th class="calendar-day-title">Lunes</th>
+                        <th class="calendar-day-title">Martes</th>
+                        <th class="calendar-day-title">Miércoles</th>
+                        <th class="calendar-day-title">Jueves</th>
+                        <th class="calendar-day-title">Viernes</th>
+                        <th class="calendar-day-title">Sábado</th>
+                        <th class="calendar-day-title">Domingo</th>
+                    </tr>
+                    <!-- Cabecera para pantallas pequeñas -->
+                    <tr class="header-narrow" style="display: none;">
+                        <th class="calendar-day-title">Lun</th>
+                        <th class="calendar-day-title">Mar</th>
+                        <th class="calendar-day-title">Mié</th>
+                        <th class="calendar-day-title">Jue</th>
+                        <th class="calendar-day-title">Vie</th>
+                        <th class="calendar-day-title">Sáb</th>
+                        <th class="calendar-day-title">Dom</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var week in Model.Weeks)
+                    {
+                        <tr>
+                            @foreach (var day in week.Days)
+                            {
+                                <td class="calendar-day @(day.IsCurrentMonth ? "current-month" : "other-month") @(GetDayCssClass(day.Date, Model.Holidays)) @(day.actualDay ? "actualDay" : "")"
+                                    data-date="@day.Date.ToString("yyyy-MM-dd")"
+                                    onclick="cargarTrabajosDiaUsuario(@Model.UsuarioPk, '@day.Date.ToString("yyyy-MM-dd")')">
+                                    @if (day.IsCurrentMonth)
+                                    {
+                                        <div>@day.Date.Day</div>
+                                        @if (day.Trabajos != null && day.Trabajos.listTrabajos.Any())
+                                        {
+                                            <span class="badge badge-info">@day.Trabajos.listTrabajos.Count Asignados</span>
+                                        }
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="trabajosDiaUsuario">
+
+    </div>
+</div>
+<script>
+    adjustCalendarHeader();
+    window.addEventListener('resize', adjustCalendarHeader);
+
+    function adjustCalendarHeader() {
+        if (window.innerWidth > 768) {
+            document.querySelector('.header-wide').style.display = '';
+            document.querySelector('.header-narrow').style.display = 'none';
+        } else {
+            document.querySelector('.header-wide').style.display = 'none';
+            document.querySelector('.header-narrow').style.display = '';
+        }
+    }
+
+    function cargarTrabajosDiaUsuario (usuarioPk, date) {
+        // Llamada AJAX a la acción GetTrabajos del controlador Trabajos.
+        $.ajax({
+            url: '/Trabajos/GetTrabajos',
+            type: 'GET',
+            data: { UsuarioPk: usuarioPk, date: date},
+            success: function (response) {
+                // Inserta la vista retornada en el div .trabajosDiaUsuario
+                $(".trabajosDiaUsuario").html(response.partial);
+            },
+            error: function () {                        
+                Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error cargando trabajos del dia del usuario, prueba a intentarlo de nuevo mas tarde o pongase en contacto con un administrador'
+                    });
+            }
+        });
+    }
+</script>
+@functions {
+    public string GetDayCssClass(DateTime date, List<DateTime> holidays)
+    {
+        // Verifica si la fecha está en la lista de festivos (comparación por fecha)
+        if (holidays != null && holidays.Any(h => h.Date == date.Date))
+        {
+            return "festivo"; // Clase CSS para días festivos (en rojo)
+        }
+        if (date.DayOfWeek == DayOfWeek.Sunday)
+        {
+            return "festivo"; // Domingos en rojo
+        }
+        if (date.DayOfWeek == DayOfWeek.Saturday)
+        {
+            return "sabado"; // Sábados en gris
+        }
+        return "";
+    }
+}

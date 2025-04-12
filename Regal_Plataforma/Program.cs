@@ -54,6 +54,8 @@ builder.Services.AddScoped<IGremiosServices, GremioServices>();
 builder.Services.AddScoped<INotasServices, NotasService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IObraService, ObraService>();
+builder.Services.AddScoped<ITrabajosServices, TrabajosServices>();
+builder.Services.AddScoped<IArchivoService, ArchivoService>();
 builder.Services.AddHttpClient<IAPIServices, ApiService>();
 
 var app = builder.Build();

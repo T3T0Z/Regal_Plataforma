@@ -2,16 +2,15 @@
 
 @foreach (var user in Model.listUsuarios)
 {
-    var roles = new List<string>();
-    if (user.Gestor) roles.Add("Gestor");
-    if (user.Operario) roles.Add("Operario");
-    if (user.Externo) roles.Add("Externo");
-
-    <div class="card card-custom" data-rol="@string.Join(" ", roles)" onclick="verDetallesUsuario(@user.UsuarioPk)">
+    <div class="card card-custom" onclick="verDetallesUsuario(@user.UsuarioPk)" data-rol="@user.RolPk.Value">
         <div class="card-content">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <strong>Usuario:</strong> @user.Usuario1
-                <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); eliminarUsuario(@user.UsuarioPk)">Eliminar</button>
+            <div class="card-header card-header-obras">
+                <span><strong>Usuario:</strong> @user.Usuario1</span>
+                <div class="btn-obras-header">
+                    <button type="button" class="btn mx-sm-1" onclick="cargarPartialEnModal('modalLg', '/Archivos/Galeria?entidad=Usuario&entidadPk=@user.UsuarioPk', 'modalLgBody')"> Ver Archivos </button>
+                    <button class="btn btn-sm mx-sm-1" onclick="event.stopPropagation(); eliminarUsuario(@user.UsuarioPk)">Eliminar</button>
+                    <button class="btn btn-sm mx-sm-1" onclick="event.stopPropagation(); cargarPartialEnModal('modalLg', '@($"/Usuarios/GetCreateEditUsuario?usuarioPk={user.UsuarioPk}")', 'modalLgBody')">Editar</button>
+                </div>
             </div>
 
             <div class="row">
@@ -25,7 +24,7 @@
                 </div>
                 <div class="col-md-4">
                     <strong class="card-enunciados">Rol:</strong>
-                    <span class="card-encargos">@string.Join(", ", roles)</span>
+                    <span class="card-encargos">@user.RolPkNavigation.Rol</span>
                 </div>
             </div>
         </div>

@@ -11,11 +11,54 @@
         <partial name="~/Views/Shared/PartialViews/_detallesUsuario.cshtml" model="@Model" />
     </div>
 
+    <div class="calendarioUsuario">
+        <partial name="~/Views/Shared/PartialViews/_calendarioMensualUsuario.cshtml" model="@Model.Calendario.Calendars.Where(x=> x.Year == DateTime.Now.Year && x.Month == DateTime.Now.Month).FirstOrDefault()" />
+    </div>
+
     <div class="notasUsuario">
         <partial name="~/Views/Shared/PartialViews/_notasUsuario.cshtml" model="@Model.Notas" />
     </div>
 
-    <button class="btn btn-outline-secondary mt-3" onclick="window.location.href='/Usuarios/Index'">
-        Volver al listado
+    <button class="btnBack btn" onclick="window.location.href='/Usuarios/Index'">
+        Volver a usuarios
     </button>
 </div>
+
+@section Scripts {
+    <script>
+        function verMes(year, month, UsuarioPk)
+        {
+                $.ajax({
+                    url: '/Usuarios/MonthCalendarPartial',
+                    data: { year: year, month: month, UsuarioPk: UsuarioPk },
+                    success: function(result) {
+                        $(".calendarioUsuario").html(result.partial);
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error cargando calendario mensual, prueba a intentarlo de nuevo mas tarde o pongase en contacto con un administrador'
+                        });
+                    }
+                });
+        }
+        function verYear(year, UsuarioPk)
+        {
+            $.ajax({
+                    url: '/Usuarios/YearCalendarPartial',
+                    data: { year: year, UsuarioPk: UsuarioPk },
+                    success: function(result) {
+                        $(".calendarioUsuario").html(result.partial);
+                    },
+                    error: function() {                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error cargando calendario anual, prueba a intentarlo de nuevo mas tarde o pongase en contacto con un administrador'
+                        });
+                    }
+                });
+        }
+    </script>
+}

@@ -33,13 +33,16 @@
     <div class="card-container">
         @foreach (var obra in Model.listObras)
         {
-            <div class="card card-custom" data-estado="@obra.EstadoObraPk" onclick="cargarPartialEnModal('modalLg', '@($"/Clientes/GetCreateEdit?ObraPk={obra.ObraPk}")', 'modalLgBody')">
+            <div class="card card-custom" data-estado="@obra.EstadoObraPk" onclick="cargarPartialEnModal('modalLg', '@($"/Obras/GetCreateEdit?ObraPk={obra.ObraPk}")', 'modalLgBody')">
                 <div class="card-content">
                     <div class="card-header card-header-obras">
                         <span><strong>Obra:</strong> @obra.Nombre</span>
                         <div class="btn-obras-header">
+                            <button type="button" class="btn mx-sm-1" onclick="cargarPartialEnModal('modalLg', '/Archivos/Galeria?entidad=Obra&entidadPk=@obra.ObraPk', 'modalLgBody')"> Ver Archivos </button>
+                            <button class="btn mx-sm-1" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetTrabajos?ObraPk={obra.ObraPk}")', 'modalLgBody')">Ver Trabajos</button>
+                            <button class="btn btn-sm mx-sm-1" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEdit?ObraPk={obra.ObraPk}")', 'modalLgBody')">Nuevo Trabajo</button>
                             <button type="button"
-                                    class="btn btn-sm"
+                                    class="btn btn-sm mx-sm-1"
                                     onclick="event.stopPropagation(); cargarPartialEnModal('modalLg', '@($"/Obras/GetNotasObra?Obra_PK={obra.ObraPk}")', 'modalLgBody')">
                                 <i class="fa-solid fa-note-sticky"></i> Ver Notas
                             </button>
@@ -103,6 +106,7 @@
                 applyFilters();
             });
 
+            // Mostrar u ocultar el botón según el scroll
             window.addEventListener("scroll", function () {
                 var btn = document.getElementById("btnScrollTop");
                 btn.style.display = window.scrollY > 100 ? "block" : "none";
@@ -206,7 +210,7 @@
             let formData = $("#formNotaObra").serialize();
 
             $.ajax({
-                url: '@Url.Action("CreateEditNotaObra", "Obras")', // Asegúrate de que la ruta es correcta
+                url: '/Obras/CreateEditNotaObra', // Asegúrate de que la ruta es correcta
                 type: 'POST',
                 data: formData,
                 success: function(response) {
@@ -255,7 +259,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '@Url.Action("DeleteNotaObra", "Obras")', // Asegúrate de que la ruta es correcta
+                        url: '/Obras/DeleteNotaObra', // Asegúrate de que la ruta es correcta
                         type: 'POST',
                         data: { NotasObra_PK: id, Obra_PK: Obra_PK },
                         dataType: 'json',
@@ -292,6 +296,11 @@
                     });
                 }
             });
+        }
+
+        // Función para hacer scroll suave hacia arriba
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
     </script>

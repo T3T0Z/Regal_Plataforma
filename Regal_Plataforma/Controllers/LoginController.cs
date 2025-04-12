@@ -31,7 +31,7 @@ namespace Regal_Plataforma.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                if (User.IsInRole("Administrador"))
+                if (User.IsInRole("Gestor"))
                 {
                     return RedirectToAction("Index", "Gestion");
                 }
@@ -75,7 +75,7 @@ namespace Regal_Plataforma.Controllers
 
                         Func_Comunes.LogsAplicacion(TiposLogs.INFO, vm.usuario, $"Inicio de sesion correcto - PK ({usuario.UsuarioPk}) - Rol ({usuario.RolPkNavigation.Rol}) - Name ({usuario.Usuario1})");
 
-                        if (usuario.RolPkNavigation.Rol == "Administrador")
+                        if (usuario.RolPkNavigation.Rol == "Gestor")
                         {
                             return RedirectToAction("Index", "Gestion");
                         }

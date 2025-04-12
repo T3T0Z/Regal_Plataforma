@@ -25,7 +25,7 @@
             <tbody>
                 @if (Model != null && Model.listNotas.Count > 0)
                 {
-                    foreach (var nota in Model.listNotas.OrderByDescending(x=>x.FechaCreacion))
+                    foreach (var nota in Model.listNotas.OrderByDescending(x => x.FechaCreacion))
                     {
                         <tr>
                             <td class="filas-tablas">@nota.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
@@ -41,7 +41,7 @@
                 else
                 {
                     <tr>
-                        <td colspan="3" class="text-center text-muted">No hay notas registradas</td>
+                        <td colspan="4" class="text-center text-muted">No hay notas registradas</td>
                     </tr>
                 }
             </tbody>

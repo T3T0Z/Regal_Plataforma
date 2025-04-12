@@ -1,0 +1,304 @@
+﻿@model VM_GaleriaArchivos
+
+<div class="container mt-3">
+    <!-- Formulario para subir archivos -->
+    <form id="formSubidaArchivos" enctype="multipart/form-data" class="mb-4">
+        <input type="hidden" name="Entidad" value="@Model.Entidad" />
+        <input type="hidden" name="EntidadPk" value="@Model.EntidadPk" />
+
+        <div class="input-group">
+            <input type="file" name="archivos" multiple class="form-control" style="height: 100% !important;" />
+            <button id="btnSubirArchivos" class="btn btnSubirArchivos">Subir</button>
+        </div>
+    </form>
+
+    @if (Model.ListaArchivos?.Any() == true && !string.IsNullOrEmpty(Model.ListaArchivos.First().Ruta))
+    {
+        <div class="archivo-info mb-2">
+            <strong>Total Archivos:</strong>
+            <span id="totalArchivos">@Model.ListaArchivos.Count()</span>
+        </div>
+
+
+        <div class="archivo-visor text-center" style="height: 60vh;">
+            @{
+                var ruta = Model.ListaArchivos.First().Ruta;
+                var rutaCodificada = Uri.EscapeDataString(ruta); // mejor codificación
+                var archivoActual = Model.ListaArchivos.First();
+                var extension = archivoActual.Extension?.ToLower();
+            }
+            @if (extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".gif" || extension == ".webp" || extension == ".bmp")
+            {
+                <img id="visorArchivo" src="/Archivos/Ver?ruta=@rutaCodificada" />
+            }
+            else
+            {
+                <iframe id="visorArchivo" src="/Archivos/Ver?ruta=@rutaCodificada" style="border: none; width: 100%; height: 100%" ></iframe>
+            }
+        </div>
+
+        <div class="archivo-info mb-2">
+            <strong>Archivo actual:</strong>
+            <span id="nombreArchivoActual">@Model.ListaArchivos.First().NombreArchivo</span>
+        </div>
+
+        <div class="archivo-controles mt-2 d-flex justify-content-between">
+            <button id="anteriorArchivo" class="btn anteriorArchivo">Anterior</button>
+            <button id="eliminarArchivo" class="btn me-1 eliminarArchivo">Eliminar</button>
+            <button id="descargarArchivo" class="btn ms-1 descargarArchivo">Descargar</button>
+            <button id="siguienteArchivo" class="btn siguienteArchivo">Siguiente</button>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">No hay archivos disponibles para esta entidad.</div>
+    }
+</div>
+
+<script>
+    @if (Model.ListaArchivos?.Any() == true)
+    {
+                <text>inicializarGaleriaArchivos(@Html.Raw(Json.Serialize(Model.ListaArchivos)));</text>
+    }
+
+    $("#btnSubirArchivos").off("click").on("click", function (e) {
+        e.preventDefault();
+
+        const form = document.getElementById("formSubidaArchivos");
+        const inputFile = form.querySelector('input[type="file"]');
+        const files = inputFile.files;
+
+        if (files.length === 0) {
+            Swal.fire("Advertencia", "Debe seleccionar al menos un archivo", "warning");
+            return;
+        }
+
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append("archivos", files[i]); // importante: sin []
+        }
+
+        formData.append("entidad", form.querySelector('input[name="Entidad"]').value);
+        formData.append("entidadPk", form.querySelector('input[name="EntidadPk"]').value);
+
+        $.ajax({
+            url: '/Archivos/Subir',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+                if (res.status === "OK") {
+                    Swal.fire("Subido", "Archivo subido", "success");
+                } else {
+                    Swal.fire("Error", "No se pudo subir el archivo", "error");
+                }
+            },
+            error: function () {
+                Swal.fire("Error", "No se pudo subir el archivo", "error");
+            }
+        });
+    });
+
+    function inicializarGaleriaArchivos(listaArchivos) {
+        let archivosGaleria = listaArchivos;
+        let indiceActual = 0;
+
+        function actualizarVisor() {
+            if (!archivosGaleria.length) return;
+
+            const archivo = archivosGaleria[indiceActual];
+            $("#nombreArchivoActual").text(archivo.nombreArchivo);
+            $("#totalArchivos").text(archivosGaleria.length);
+
+            const extension = archivo.extension?.toLowerCase();
+            const ruta = encodeURIComponent(archivo.ruta);
+
+            let contenido;
+            if ([".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"].includes(extension)) {
+                contenido = `<img id="visorArchivo" src="/Archivos/Ver?ruta=${ruta}" class="img-fluid" />`;
+            } else {
+                contenido = `<iframe id="visorArchivo" src="/Archivos/Ver?ruta=${ruta}" style="border: none; width: 100%; height: 100%"></iframe>`;
+            }
+
+            $(".archivo-visor").html(contenido);
+        }
+
+        $("#anteriorArchivo").off("click").on("click", function () {
+            if (indiceActual > 0) {
+                indiceActual--;
+                actualizarVisor();
+            }
+        });
+
+        $("#siguienteArchivo").off("click").on("click", function () {
+            if (indiceActual < archivosGaleria.length - 1) {
+                indiceActual++;
+                actualizarVisor();
+            }
+        });
+
+        $("#eliminarArchivo").off("click").on("click", function () {
+            if (!archivosGaleria.length) return;
+
+            const archivo = archivosGaleria[indiceActual];
+            Swal.fire({
+                title: "¿Estás seguro de eliminar el archivo?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then(result => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Archivos/Eliminar',
+                        type: 'POST',
+                        contentType: 'application/json', // 👈 NECESARIO
+                        data: JSON.stringify(archivo),   // 👈 convertir el objeto en JSON
+                        success: function (res) {
+                            if (res.status === "OK") {
+                                archivosGaleria.splice(indiceActual, 1);
+                                if (indiceActual > 0) indiceActual--;
+                                actualizarVisor();
+                                Swal.fire("Eliminado", "Archivo eliminado", "success");
+                            } else {
+                                Swal.fire("Error", "No se pudo eliminar el archivo", "error");
+                            }
+                        },
+                        error: function () {
+                            Swal.fire("Error", "No se pudo eliminar el archivo", "error");
+                        }
+                    });
+                }
+            });
+        });
+
+        $("#descargarArchivo").off("click").on("click", function () {
+        if (!archivosGaleria.length) return;
+
+        const archivo = archivosGaleria[indiceActual];
+        const rutaDescarga = `/Archivos/Ver?ruta=${encodeURIComponent(archivo.ruta)}`;
+
+        const enlace = document.createElement("a");
+        enlace.href = rutaDescarga;
+        enlace.download = archivo.nombreArchivo; // Sugerir nombre al navegador
+        document.body.appendChild(enlace);
+        enlace.click();
+        document.body.removeChild(enlace);
+    });
+
+        // Cargar el primer archivo
+        actualizarVisor();
+    }
+
+</script>
+
+@* <script>
+    function inicializarGaleriaArchivos(listaArchivos) {
+        let archivosGaleria = listaArchivos;
+        let indiceActual = 0;
+
+        function actualizarVisor() {
+            if (!archivosGaleria.length) return;
+
+            const archivo = archivosGaleria[indiceActual];
+            $("#nombreArchivoActual").text(archivo.nombreArchivo);
+
+            const extension = archivo.extension?.toLowerCase();
+            const ruta = encodeURIComponent(archivo.ruta);
+
+            let contenido;
+            if ([".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"].includes(extension)) {
+                contenido = `<img id="visorArchivo" src="/Archivos/Ver?ruta=${ruta}" class="img-fluid" />`;
+            } else {
+                    contenido = `<iframe id="visorArchivo" src="/Archivos/Ver?ruta=${ruta}" style="border: none; width: 100%; height: 100%"></iframe>`;
+            }
+
+            $(".archivo-visor").html(contenido);
+        }
+
+        $("#anteriorArchivo").off("click").on("click", function () {
+            if (indiceActual > 0) {
+                indiceActual--;
+                actualizarVisor();
+            }
+        });
+
+        $("#siguienteArchivo").off("click").on("click", function () {
+            if (indiceActual < archivosGaleria.length - 1) {
+                indiceActual++;
+                actualizarVisor();
+            }
+        });
+
+        $("#eliminarArchivo").off("click").on("click", function () {
+            if (!archivosGaleria.length) return;
+
+            const archivo = archivosGaleria[indiceActual];
+            Swal.fire({
+                title: "¿Estás seguro de eliminar el archivo?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then(result => {
+                if (result.isConfirmed) {
+                    $.post("/Archivos/Eliminar", archivo, function (res) {
+                        if (res.status === "OK") {
+                            archivosGaleria.splice(indiceActual, 1);
+                            if (indiceActual > 0) indiceActual--;
+                            actualizarVisor();
+                            Swal.fire("Eliminado", "Archivo eliminado", "success");
+                        } else {
+                            Swal.fire("Error", res.message, "error");
+                        }
+                    });
+                }
+            });
+        });
+    $(".btnSubirArchivos").on("click", function (e) {
+        e.preventDefault();
+
+        const form = document.getElementById("formSubidaArchivos");
+        const inputFile = form.querySelector('input[type="file"]');
+        const files = inputFile.files;
+
+        if (files.length === 0) {
+            Swal.fire("Advertencia", "Debe seleccionar al menos un archivo", "warning");
+            return;
+        }
+
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append("archivos", files[i]); // 👈 sin []
+        }
+
+        formData.append("entidad", form.querySelector('input[name="Entidad"]').value);
+        formData.append("entidadPk", form.querySelector('input[name="EntidadPk"]').value);
+
+        $.ajax({
+            url: '/Archivos/Subir',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+                if (res.status === "OK") {
+                    location.reload();
+                } else {
+                    Swal.fire("Error", res.message, "error");
+                }
+            },
+            error: function () {
+                Swal.fire("Error", "No se pudo subir el archivo", "error");
+            }
+        });
+    });
+
+
+    // LLAMADA INICIAL AUTOMÁTICA si tienes la lista ya renderizada desde el servidor:
+    @if (Model.ListaArchivos?.Any() == true)
+    {
+            <text>inicializarGaleriaArchivos(@Html.Raw(Json.Serialize(Model.ListaArchivos)));</text>
+    }
+</script> *@

@@ -1,0 +1,95 @@
+﻿@model VM_NotasTrabajo;
+
+<table class="table table-striped tabla-notas align-middle">
+    <thead class="thead-notas">
+        <tr class="filas-tablasfilas-tablas-titulo">
+            <th class="col-fecha filas-tablas-titulo">Fecha</th>
+            <th class="col-usuario filas-tablas-titulo">Usuario</th>
+            <th class="filas-tablas-titulo">Nota</th>
+            <th class="col-acciones filas-tablas-titulo">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.listNotas.Count > 0)
+        {
+            foreach (var nota in Model.listNotas.OrderByDescending(x=>x.FechaCreacion))
+            {
+                <tr>
+                    <td class="filas-tablas">@nota.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="filas-tablas">@nota.UsuarioPkNavigation?.Nombre</td>
+                    <td class="filas-tablas">@nota.Nota</td>
+                    <td class="filas-tablas">
+                        <i class="icon fa-solid fa-pen-to-square" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEditNotaTrabajo?NotasTrabajo_PK={nota.NotasTrabajoPk}&Usuario_PK={Model.Trabajo_PK}")', 'modalLgBody')"></i>
+                        <i class="icon fa-solid fa-trash ml-2" onclick="eliminarNota(@nota.NotasTrabajoPk, @nota.TrabajoPk)"></i>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center text-muted">No hay notas registradas</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Se añade onclick="event.stopPropagation()" para que al interactuar con este bloque no se dispare el toggle -->
+<div class="modal-footer">
+    <button type="button" class="btn my-0" data-dismiss="modal">Cerrar</button>
+    <button class="btn" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEditNotaTrabajo?Trabajo_PK={Model.Trabajo_PK}")', 'modalLgBody')">Nueva Nota</button>
+</div>
+<script>
+    function eliminarNota(id, Trabajo_PK) {
+        Swal.fire({
+            title: "¿Estás seguro de eliminar esta nota?",
+            text: "No podrás revertir esta acción",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Eliminar",
+            cancelButtonText:"Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Trabajos/DeleteNota', // Asegúrate de que la ruta es correcta
+                    type: 'POST',
+                    data: { NotasTrabajo_PK: id, Trabajo_PK: Trabajo_PK },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === "OK") {
+                            // Actualiza el contenido de la partial view del encargo
+                            Swal.fire({
+                                timer: 1500,
+                                title: "Eliminada",
+                                text: "La nota ha sido eliminada",
+                                icon: "success"
+                            });
+                            cargarPartialEnModal('modalLg', "/Trabajos/GetNotasTrabajo?Trabajo_PK=" + Trabajo_PK, 'modalLgBody');
+
+                        } else {
+                            Swal.fire({
+                                timer: 1500,
+                                icon: "error",
+                                title: "ERROR",
+                                text: response.message,
+                                footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            timer: 1500,
+                            icon: "error",
+                            title: "ERROR",
+                            text: "La nota ha sido eliminada",
+                            footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                        });
+                    }
+                });
+            }
+        });
+    }
+</script>
+

@@ -1,5 +1,6 @@
 /*HEADER*/
 /* Estilos para el header */
+
 /*BOTONES*/
 .btn {
     border: 2px solid #27436e;
@@ -20,6 +21,27 @@
         background-color: #27436e !important;
         color: white;
         box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #27436e !important;
+    }
+
+.btn-header-white {
+    background: transparent;
+    border: 1px solid #fff;
+    border-radius: 3px;
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 16px;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+    .btn-header-white:hover, .btn-header-white:focus, .btn-header-white:active:focus, .btn-header-white.nav-link:focus {
+        background-color: white !important;
+        color: black;
+        box-shadow: 0 0 0 0.1rem black, 0 0 0 0.25rem white !important;
+    }
+    .btn-header-white option {
+        color: #000;
     }
 
 /*FORMULARIO*/
@@ -55,6 +77,28 @@ label {
     font-size: 12px;
 }
 
+/*ARCHIVOS*/
+/* Estilos comunes para iframe e imagen */
+.archivo-visor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 500px; /* puedes ajustar el alto */
+    overflow: hidden;
+    padding: 0;
+    text-align: center;
+}
+
+#visorArchivo[type="img"] {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    margin: auto;
+    border: none;
+}
+
 /*CARD OBRAS*/
 .card-header-obras {
     position: relative;
@@ -68,14 +112,7 @@ label {
     display: flex;
 }
 
-
-
-
-
-
-
-
-
+/*MODAL*/
 .modal-regal {
     border-radius: 16px;
     background-color: #f8f9fa;
@@ -101,11 +138,11 @@ label {
         padding: 1.25rem;
         min-height: 100px;
     }
+
     .modal-regal .modal-footer {
         padding-bottom: 0px;
         padding-top: 1rem;
     }
-    
 
 .modal-header-custom {
     display: flex;
@@ -117,23 +154,22 @@ label {
     color: white;
 }
 
-.modal-header-custom .cerrar-modal {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    transition: transform 0.3s ease, color 0.3s ease;
-    color: white;
-}
-
-    .modal-header-custom .cerrar-modal:hover {
-        transform: translateY(-50%) scale(1.2) rotate(90deg);
-        color: #ffdddd;
+    .modal-header-custom .cerrar-modal {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        transition: transform 0.3s ease, color 0.3s ease;
+        color: white;
     }
 
-/* ---------- GENERAL FORMS ---------- */
+        .modal-header-custom .cerrar-modal:hover {
+            transform: translateY(-50%) scale(1.2) rotate(90deg);
+            color: #ffdddd;
+        }
 
+/*GENERAL FORMS*/
 button.btn-primary {
     background-color: #27436e;
     border-color: #27436e;
@@ -148,50 +184,16 @@ button.btn-primary {
     text-align: right;
 }
 
-
-/*.custom-modal.modal-xs {
-    max-width: 350px;
-}
-
-.custom-modal.modal-sm {
-    max-width: 500px;
-}
-
-.custom-modal.modal-md {
-    max-width: 700px;
-}
-
-.custom-modal.modal-lg {
-    max-width: 1000px;
-}
-
-
-.custom-modal.modal-xs {
-    max-width: 320px;
-}
-
-.custom-modal.modal-sm {
-    max-width: 450px;
-}
-
-.custom-modal.modal-md {
-    max-width: 650px;
-}
-
-.custom-modal.modal-lg {
-    max-width: 900px;
-}*/
-
-
-/*Ejemplo de estilos existentes*/ 
-
-
+/*ICONOS*/
 .icon {
     color: #27436e;
     cursor: pointer;
     font-weight: bold;
     transition: all 0.3s ease-in-out;
+    margin: 0px !important;
+    padding-inline: 2px;
 }
+
     .icon:hover,
     .icon.active,
     .icon:focus,
@@ -200,7 +202,7 @@ button.btn-primary {
         color: #3b5b90;
     }
 
-/* Aseguramos que html y body ocupen el 100% de la altura */
+/*HTML Y BODY*/
 html {
     height: 100%;
 }
@@ -214,12 +216,10 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-/* El header y el footer ocupan solo el espacio que necesitan */
 header, footer {
     flex: 0 0 auto;
 }
 
-/* El main se expande para ocupar el espacio restante */
 main {
     flex: 1 0 auto;
 }
@@ -248,6 +248,7 @@ main {
     border: none;
     background-color: transparent;
 }
+
     .action-btn:focus,
     .action-btn:active {
         outline: none;
@@ -277,13 +278,11 @@ main {
     background-color: #f5f6f7;
 }
 
-/* Textos */
 .card-enunciados {
     font-weight: 600;
     color: #1a1a1a;
 }
 
-/* Ajustes de card si aún no los tienes */
 .card-custom {
     background-color: #f5f6f7;
     box-shadow: 2px 2px 6px rgba(27, 64, 106, 0.3);
@@ -292,13 +291,7 @@ main {
     position: relative;
 }
 
-.card-enunciados {
-    font-weight: 600;
-    color: #1a1a1a;
-    font-size: 14px;
-}
-
-.card-encargos{
+.card-encargos {
     color: #333;
     font-weight: 400;
     font-size: 13px;
@@ -346,7 +339,6 @@ main {
 }
 
 /*DETALLES ENCARGO*/
-/* Botón de subir */
 .btnBack {
     position: fixed;
     bottom: 5%;
@@ -376,7 +368,6 @@ main {
     cursor: pointer;
 }
 
-/* Grupo izquierdo: Título y toggles */
 .header-left {
     display: flex;
     align-items: center;
@@ -388,12 +379,12 @@ main {
     margin-right: 10px;
 }
 
-/* Grupo derecho: Label y select */
 .header-right {
     display: flex;
     align-items: center;
     cursor: auto;
 }
+
     .header-right label {
         margin-top: 5px;
         margin-right: 10px;
@@ -412,11 +403,13 @@ main {
     -moz-appearance: none;
     appearance: none;
 }
+
     .select-gremio:hover, .select-gremio:focus, .select-gremio:active:focus, .select-gremio.nav-link:focus {
         background-color: white !important;
         color: black;
         box-shadow: 0 0 0 0.1rem black, 0 0 0 0.25rem white !important;
     }
+
     .select-gremio option {
         color: #000;
     }
@@ -433,6 +426,7 @@ main {
     -moz-appearance: none;
     appearance: none;
 }
+
     .btn-crearnota:hover, .btn-crearnota:focus, .btn-crearnota:active:focus, .btn-crearnota.nav-link:focus {
         background-color: white !important;
         color: black;
@@ -453,29 +447,26 @@ main {
     font-size: 1rem;
     padding: 4px;
 }
+
     .btn-copiar:hover {
         color: #3b5b90;
     }
 
-/* Cuerpo principal (contenido) */
 .encargo-body {
     padding: 15px;
 }
 
-/* Línea contenedora de dos columnas */
 .info-line {
     display: flex;
     flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
 }
 
-/* Columna al 50% */
 .info-col {
     flex: 0 0 33%;
     box-sizing: border-box;
     padding: 5px;
 }
 
-/* Título de sección subrayado */
 .section-title {
     margin-top: 3%;
     font-weight: bolder;
@@ -485,25 +476,21 @@ main {
     font-size: 20px;
 }
 
-/* Etiquetas en negrita */
 .info-label {
     font-weight: bold;
     margin-right: 5px;
 }
 
-/* Línea divisoria */
 .line-separator {
     border-top: 2px solid #dc3545;
     margin-bottom: 15px;
 }
 
 /*NOTAS*/
-/* Contenedor de la tarjeta de notas */
 .card-notas {
     border: 1px solid #ccc;
 }
 
-/* Encabezado de la tarjeta */
 .header-notas {
     border-start-end-radius: 5px;
     border-start-start-radius: 5px;
@@ -511,45 +498,44 @@ main {
     color: #fff;
 }
 
-/* Cuerpo de la tarjeta */
 .body-notas {
     padding: 15px;
 }
-/* Cabecera de tabla con fondo oscuro */
+
 .thead-notas {
     background-color: #27436e;
     color: white;
     font-weight: bold;
 }
 
-/* Bordes verticales */
 .table-separada td,
 .table-separada th {
     border-right: 2px solid black;
 }
-    /* Elimina el borde del último td/th */
+
     .table-separada td:last-child,
     .table-separada th:last-child {
         border-right: none;
     }
 
-/* Columnas que no deben crecer de más */
 .col-fecha,
-.col-acciones, 
+.col-acciones,
 .col-usuario {
     white-space: nowrap;
 }
+
 .col-fecha {
     width: 13%;
 }
+
 .col-usuario {
     width: 5%;
 }
+
 .col-acciones {
     width: 5%;
 }
 
-/* Estilo general */
 .tabla-notas {
     border-radius: 8px;
     overflow: hidden;
@@ -557,25 +543,113 @@ main {
     background-color: white;
 }
 
-/* Modales para notas */
 .modal-notas {
     border-radius: 10px;
-    /* Puedes añadir más estilos si deseas */
 }
 
-/* Encabezado del modal */
 .header-modal-notas {
     background-color: #dc3545;
     color: #fff;
 }
 
-/* Cuerpo del modal */
 .body-modal-notas {
     padding: 20px;
 }
 
-/* Footer del modal */
 .footer-modal-notas {
     display: flex;
     justify-content: flex-end;
+}
+
+/*CALENDARIO*/
+.calendario-header {
+    border-start-end-radius: 5px;
+    border-start-start-radius: 5px;
+    padding-bottom: 10px;
+    padding-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+.month-tile-selected {
+    border: 2px solid #27436e;
+    background: #27436e;
+    color: transparent;
+    padding: 10px 15px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+    margin: 0px;
+}
+.month-tile {
+    border: 2px solid #27436e;
+    background: transparent;
+    color: #27436e;
+    padding: 10px 15px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+    margin: 0px;
+}
+
+    .month-tile:hover,
+    .month-tile.active,
+    .month-tile:focus,
+    .month-tile:active:focus {
+        background-color: #27436e !important;
+        color: white;
+        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #27436e !important;
+    }
+
+.calendar-day-title {
+    border: 2px solid #27436e;
+    background: transparent;
+    color: #27436e;
+    padding: 5px 5px !important;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+    margin: 0px;
+    max-width: 10px !important;
+}
+
+.calendar-day {
+    border: 2px solid #27436e;
+    background: transparent;
+    padding: 5px 5px !important;
+    color: #27436e;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+    height: 4rem !important;
+    max-width: 10px !important;
+}
+
+.other-month {
+    padding: 0px !important;
+    height: 0px !important;
+    background-color: dimgray !important;
+}
+
+.sabado {
+    background-color: aliceblue;
+}
+
+.festivo {
+    background-color: indianred;
+}
+
+.actualMonth {
+    background-color: lightgreen !important;
+}
+
+.actualDay {
+    background-color: lightgreen !important;
 }

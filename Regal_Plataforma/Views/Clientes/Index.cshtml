@@ -24,11 +24,14 @@
                     <div class="card-header card-header-obras">
                         <span><strong>Cliente:</strong> @cliente.Nombre</span>
                         <div class="btn-obras-header">
+                            <button type="button" class="btn mx-sm-1" onclick="cargarPartialEnModal('modalLg', '/Archivos/Galeria?entidad=Cliente&entidadPk=@cliente.ClientePk', 'modalLgBody')"> Ver Archivos </button>
                             <button type="button"
-                                    class="btn btn-sm"
+                                    class="btn btn-sm mx-sm-1"
                                     onclick="event.stopPropagation(); cargarPartialEnModal('modalLg', '@($"/Clientes/GetNotasCliente?Cliente_PK={cliente.ClientePk}")', 'modalLgBody')">
                                 <i class="fa-solid fa-note-sticky"></i> Ver Notas
                             </button>
+                            <button class="btn btn-sm mx-sm-1" onclick="event.stopPropagation(); eliminarCliente(@cliente.ClientePk)">Eliminar</button>
+
                         </div>
                     </div>
 
@@ -52,9 +55,6 @@
                             <strong class="card-enunciados">Dirección:</strong>
                             <span class="card-encargos text-truncate">@cliente.DireccionPkNavigation?.NombreVia</span>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); eliminarCliente(@cliente.ClientePk)">Eliminar</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -67,6 +67,7 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+
             $("#searchInput").on("keyup", function () {
                 const value = $(this).val().toLowerCase();
                 $(".card-custom").each(function () {
@@ -76,26 +77,10 @@
             });
 
             // Mostrar u ocultar el botón según el scroll
-            window.addEventListener("scroll", function ()
-            {
+            window.addEventListener("scroll", function () {
                 var btn = document.getElementById("btnScrollTop");
-                // Si hace scroll
-                if (window.scrollY > 100) { // Umbral: 100px
-                    btn.style.display = "block";
-                }
-                else
-                {
-                    btn.style.display = "none";
-                }
-                // Si la distancia del final es menor a 100 píxeles, establece bottom a 8%
-                if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight)
-                {
-                    btn.style.marginBottom = '2%';
-                }
-                else
-                {
-                    btn.style.marginBottom = '1%';
-                }
+                btn.style.display = window.scrollY > 100 ? "block" : "none";
+                btn.style.marginBottom = (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) ? '2%' : '1%';
             });
         });
 
@@ -132,7 +117,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '@Url.Action("Delete", "Clientes")', // Asegúrate de que la ruta es correcta
+                        url: '/Clientes/Deletes', // Asegúrate de que la ruta es correcta
                         type: 'POST',
                         data: { Cliente_Pk: Cliente_Pk},
                         dataType: 'json',
@@ -218,7 +203,7 @@
             let formData = $("#formNotaCliente").serialize();
 
             $.ajax({
-                url: '@Url.Action("CreateEditNotaCliente", "Clientes")', // Asegúrate de que la ruta es correcta
+                url: '/Clientes/CreateEditNotaCliente', // Asegúrate de que la ruta es correcta
                 type: 'POST',
                 data: formData,
                 success: function(response) {
@@ -267,7 +252,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '@Url.Action("DeleteNotaCliente", "Clientes")', // Asegúrate de que la ruta es correcta
+                        url: '/Clientes/DeleteNotaCliente', // Asegúrate de que la ruta es correcta
                         type: 'POST',
                         data: { NotasObra_PK: NotasObra_PK, Cliente_PK: Cliente_PK },
                         dataType: 'json',
@@ -303,6 +288,11 @@
                     });
                 }
             });
+        }
+
+        // Función para hacer scroll suave hacia arriba
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
     </script>

@@ -1,0 +1,147 @@
+﻿@model VM_CreateEditTrabajo;
+@{
+    // Si la propiedad es DateTime y no se ha asignado una fecha, usar DateTime.Now como valor predeterminado.
+    string fechaAsignada = (Model.Trabajo.FechaAsignada == DateTime.MinValue) ? DateTime.Now.ToString("yyyy-MM-ddTHH:mm") : Model.Trabajo.FechaAsignada.ToString("yyyy-MM-ddTHH:mm");
+    string fechaFinAsignada = (Model.Trabajo.FechaFinAsignada == DateTime.MinValue) ? DateTime.Now.ToString("yyyy-MM-ddTHH:mm") : Model.Trabajo.FechaFinAsignada.ToString("yyyy-MM-ddTHH:mm");
+}
+
+<form id="formTrabajo">
+    @Html.HiddenFor(x => x.Trabajo.TrabajoPk)
+    @Html.HiddenFor(x => x.Trabajo.EstadoTrabajoPk)
+
+    <div id="mensaje-error" class="alert alert-danger d-none" role="alert" style="white-space: pre-line;">
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 form-group mb-3">
+            <label>Siniestro</label>
+            @Html.DropDownListFor(x => x.Trabajo.SiniestroPk,
+                Model.listSiniestros.Select(x => new SelectListItem 
+                    { 
+                        Value = x.SiniestroPk.ToString(), 
+                        Text = x.DetallesSiniestroPkNavigation.NumeroSiniestro 
+                    }),
+                     "Seleccione un siniestro",
+                     new { @class = "form-control selectpicker", @data_live_search = "true" })
+        </div>
+
+        <div class="col-md-4 form-group mb-3">
+            <label>Obra</label>
+            @Html.DropDownListFor(x => x.Trabajo.ObraPk,
+                new SelectList(Model.listObras, "ObraPk", "Nombre"),
+                     "Seleccione una obra",
+                     new { @class = "form-control selectpicker", @data_live_search = "true" })
+        </div>
+
+        <div class="col-md-4 form-group mb-3">
+            <label>Estado Trabajo</label>
+            @Html.DropDownListFor(x => x.Trabajo.EstadoTrabajoPk,
+                    new SelectList(Model.listEstadosTrabajo, "EstadoTrabajoPk", "Estado"),
+                        "Seleccione un estado",
+                        new { @class = "form-control selectpicker", @data_live_search = "true", disabled = "disabled" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 form-group mb-3">
+            <label>Gestor</label>
+            @Html.DropDownListFor(x => x.Trabajo.UgestorPk,
+                new SelectList(Model.listUsuariosGestores, "UsuarioPk", "Nombre"),
+                     "Seleccione un gestor",
+                     new { @class = "form-control selectpicker", @data_live_search = "true" })
+        </div>
+
+        <div class="col-md-6 form-group mb-3">
+            <label>Usuario Asignado</label>
+            @Html.DropDownListFor(x => x.Trabajo.UasignadoPk,
+                        new SelectList(Model.listUsuariosAsignados, "UsuarioPk", "Nombre"),
+                        "Seleccione un operario",
+                        new { @class = "form-control selectpicker", @data_live_search = "true" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-6 mb-3">
+            <label for="FechaAsignada">Fecha Asignada</label>
+            @Html.TextBoxFor(model => model.Trabajo.FechaAsignada, new { id = "fechaAsignada", @class = "form-control", type = "datetime-local" })
+        </div>
+        <div class="form-group col-md-6 mb-3">
+            <label for="FechaFinAsignada">Fecha Fin Asignada</label>
+            @Html.TextBoxFor(model => model.Trabajo.FechaFinAsignada, new { id = "fechaFinAsignada", @class = "form-control", type = "datetime-local" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-12 mb-3">
+            <label for="Descripcion">Descripcion</label>
+            @Html.TextAreaFor(model => model.Trabajo.Descripcion, new { @class = "form-control" })
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn my-0" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn my-0" onclick="guardarTrabajo()">Guardar</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+        $(":input").inputmask();
+        $("#fechaAsignada").val("@fechaAsignada");
+        $("#fechaFinAsignada").val("@fechaFinAsignada");
+
+        $("#formTrabajo").validate({
+            rules: {
+                "Trabajo.FechaAsignada": {
+                    required: true
+                }
+            },
+            messages: {
+                "Trabajo.FechaAsignada": {
+                        required: "La fecha asignada es obligatoria"
+                }
+            }
+        });
+    });
+    function guardarTrabajo()
+    {
+        // Verifica si el formulario es válido antes de hacer submit
+        if (!$("#formTrabajo").valid()) {
+            return;
+        }
+
+        let formData = $("#formTrabajo").serialize();
+
+        $.ajax({
+            url: '/Trabajos/Guardar',
+            method: 'POST',
+            data: formData,
+            success: function (response) {
+                if (response.status === "OK") {
+                    $('#modalGeneral').modal('hide');
+                    Swal.fire({
+                        title: 'Correcto',
+                        text: 'Trabajo guardado con éxito.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload(); // Recarga para actualizar lista
+                    });
+                } else {
+                    document.getElementById("mensaje-error").textContent = response.message;
+                    document.getElementById("mensaje-error").classList.remove("d-none");
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error actualizando trabajo'
+                });
+            }
+        });
+    }
+
+</script>

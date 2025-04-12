@@ -18,7 +18,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-
+    <!-- FilePond CSS -->
+    <link href="https://unpkg.com/filepond/dist/filepond.min.css" rel="stylesheet" />
 </head>
 <body>
     <!-- Header -->
@@ -35,7 +36,7 @@
                     </button>
                     <div class="collapse navbar-collapse justify-content-end h-100" id="navbarNav">
                         <ul class="navbar-nav">
-                            @if (User.IsInRole("Administrador"))
+                            @if (User.IsInRole("Gestor"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-light" href="/Gestion/Index">Gestion </a>
@@ -78,9 +79,6 @@
         </div>
     </footer>
 
-    <partial name="~/Views/Shared/Modales/_modal_xs.cshtml" />
-    <partial name="~/Views/Shared/Modales/_modal_sm.cshtml" />
-    <partial name="~/Views/Shared/Modales/_modal_md.cshtml" />
     <partial name="~/Views/Shared/Modales/_modal_lg.cshtml" />
 
     @* jQuery *@
@@ -97,6 +95,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
     @* Sweetalert *@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FilePond JS -->
+    <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
     @* jSite *@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
@@ -122,6 +122,69 @@
                         icon: "error",
                         title: "Error",
                         text: "No se pudo cargar el contenido."
+                    });
+                }
+            });
+        }
+
+        function cargarGaleriaArchivos(entidad, id) {
+            $.ajax({
+                url: "/Archivos/Galeria",
+                data: { entidad: entidad, entidadPk: id },
+                success: function (response) {
+                    if (response.status === "OK") {
+                        $("#modalLgBody").html(response.partial);
+                        $("#modalLg").modal("show");
+                    }
+                },
+                error: function () {
+                    Swal.fire({ icon: "error", title: "Error", text: "No se pudo cargar los archivos" });
+                }
+            });
+        }
+
+        function subirArchivo(entidad, id) {
+            let formData = new FormData();
+            let archivo = $("#inputArchivo")[0].files[0];
+            formData.append("archivo", archivo);
+            formData.append("entidad", entidad);
+            formData.append("id", id);
+
+            $.ajax({
+                url: "/Archivos/SubirArchivo",
+                method: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                        cargarGaleriaArchivos(entidad, id);
+                },
+                error: function () {
+                    Swal.fire({ icon: "error", title: "Error", text: "No se pudo subir el archivo" });
+                }
+            });
+        }
+
+        function eliminarArchivo(entidad, id, nombre) {
+            Swal.fire({
+                title: "¿Eliminar archivo?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/Archivos/EliminarArchivo",
+                        method: "POST",
+                        data: { entidad, id, nombre },
+                        success: function (response) {
+                            if (response.status === "OK") {
+                                cargarGaleriaArchivos(entidad, id);
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({ icon: "error", title: "Error", text: "No se pudo eliminar el archivo" });
+                        }
                     });
                 }
             });

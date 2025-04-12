@@ -19,12 +19,6 @@ public partial class Usuario
 
     public string Apellidos { get; set; }
 
-    public bool Externo { get; set; }
-
-    public bool Operario { get; set; }
-
-    public bool Gestor { get; set; }
-
     public bool Activo { get; set; }
 
     public DateTime FechaCreacion { get; set; }
@@ -49,7 +43,7 @@ public partial class Usuario
 
     public virtual Role RolPkNavigation { get; set; }
 
-    public virtual ICollection<Trabajo> TrabajoUgestorPkNavigations { get; set; } = new List<Trabajo>();
+    public virtual ICollection<Trabajo> TrabajoUasignadoPkNavigations { get; set; } = new List<Trabajo>();
 
-    public virtual ICollection<Trabajo> TrabajoUoperarioPkNavigations { get; set; } = new List<Trabajo>();
+    public virtual ICollection<Trabajo> TrabajoUgestorPkNavigations { get; set; } = new List<Trabajo>();
 }

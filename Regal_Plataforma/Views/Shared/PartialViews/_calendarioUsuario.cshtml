@@ -1,0 +1,35 @@
+﻿@model VM_CalendarioUsuario
+
+
+<!-- Contenedor principal de la tarjeta -->
+<div class="encargo-container">
+    <div class="encargo-header" onclick="toggleNotasEncargoBody()">
+        <div class="header-left">
+            <span class="header-title">Calendario de Usuario</span>
+        </div>
+    </div>
+
+    <div class="encargo-body mb-0 pb-0" id="notasencargoBody">
+        <div class="calendar-overview">
+            <div class="calendario-header" onclick="toggleNotasEncargoBody()">
+                <div class="header-left">
+                    <span class="header-title">Año @Model.Year</span>
+                </div>
+                <div class="header-right">
+                    <button class="btn" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEdit?UsuarioPk={Model.UsuarioPk}")', 'modalLgBody')">Nuevo Trabajo</button>
+                </div>
+            </div>
+            <div class="row">
+                @foreach (var calendar in Model.Calendars)
+                {
+                    <div class="col-4 col-sm-3 p-0">
+                        <div class="month-tile @(calendar.actualMonth ? "actualMonth" : "")" onclick="verMes(@calendar.Year, @calendar.Month, @Model.UsuarioPk)">
+                            @(new DateTime(calendar.Year, calendar.Month, 1).ToString("MMMM").ToUpper())
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

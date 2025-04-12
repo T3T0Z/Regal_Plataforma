@@ -14,4 +14,8 @@ public interface INotasServices
     Task<bool> UpdateNotaObraAsync(NotasObra nota, int Usuario_PK);
     Task<bool> DeleteNotaObraAsync(int NotasObra_PK);
     Task<NotasObra> GetNotaObraByIdAsync(int NotasObra_PK);
+    Task<bool> CreateNotaTrabajoAsync(NotasTrabajo nota, int Usuario_PK);
+    Task<bool> UpdateNotaTrabajoAsync(NotasTrabajo nota, int Usuario_PK);
+    Task<bool> DeleteNotaTrabajoAsync(int NotasTrabajo_PK);
+    Task<NotasTrabajo> GetNotaTrabajoByIdAsync(int NotasTrabajo_PK);
 }

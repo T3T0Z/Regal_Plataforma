@@ -17,16 +17,61 @@ public class OrderDatosServices : IOrderDatosServices
     public async Task<List<OrderDato>> GetOrderDatos()
     {
         return await _dbContext.OrderDatos.Where(x => x.Activo)
+
             .Include(x => x.OrderPkNavigation)
-            .Include(x=>x.DireccionPkNavigation)
-            .Include(x=>x.SiniestroPkNavigation)
-            .ThenInclude(x=>x.NotasSiniestros)
-            .ThenInclude(x=>x.UsuarioPkNavigation)
+
+            .Include(x => x.DireccionPkNavigation)
+
+            .Include(x => x.SiniestroPkNavigation)
+            .ThenInclude(x => x.NotasSiniestros)
+            .ThenInclude(x => x.UsuarioPkNavigation)
+
             .Include(x => x.SiniestroPkNavigation)
             .ThenInclude(x => x.DetallesSiniestroPkNavigation)
-            .Include(x=>x.PaseguradoPkNavigation)
-            .Include(x=>x.PafectadaPkNavigation)
-            .Include(x=>x.GremioPkNavigation)
+
+            .Include(x => x.SiniestroPkNavigation)
+            .ThenInclude(x => x.TipoIntervencionPkNavigation)
+
+            .Include(x => x.PaseguradoPkNavigation)
+            .ThenInclude(x => x.DireccionPkNavigation)
+
+            .Include(x => x.PaseguradoPkNavigation)
+            .ThenInclude(x => x.NumeroTelefonoPkNavigation)
+
+            .Include(x => x.PaseguradoPkNavigation)
+            .ThenInclude(x => x.NumeroTelefono2PkNavigation)
+
+            .Include(x => x.PafectadaPkNavigation)
+            .ThenInclude(x => x.NumeroTelefonoPkNavigation)
+
+            .Include(x => x.PafectadaPkNavigation)
+            .ThenInclude(x => x.DireccionPkNavigation)
+
+            .Include(x => x.PinterlocutorPkNavigation)
+            .ThenInclude(x => x.NumeroTelefonoPkNavigation)
+
+            .Include(x => x.PinterlocutorPkNavigation)
+            .ThenInclude(x => x.NumeroTelefono2PkNavigation)
+
+            .Include(x => x.PcontactoPkNavigation)
+            .ThenInclude(x => x.NumeroTelefonoPkNavigation)
+
+            .Include(x => x.PcontactoPkNavigation)
+            .ThenInclude(x => x.NumeroTelefono2PkNavigation)
+
+            .Include(x => x.PagentePolizaPkNavigation)
+            .ThenInclude(x => x.NumeroTelefonoPkNavigation)
+
+            .Include(x => x.GremioPkNavigation)
+
+            .ToListAsync();
+    }
+
+    // Obtener todos los siniestros
+    public async Task<List<Siniestro>> GetSiniestros()
+    {
+        return await _dbContext.Siniestros.Where(x => x.Activo)
+            .Include(x => x.DetallesSiniestroPkNavigation)
             .ToListAsync();
     }
 
@@ -40,10 +85,24 @@ public class OrderDatosServices : IOrderDatosServices
             .ThenInclude(x => x.UsuarioPkNavigation)
             .Include(x => x.SiniestroPkNavigation)
             .ThenInclude(x => x.DetallesSiniestroPkNavigation)
+            .Include(x => x.SiniestroPkNavigation)
+            .ThenInclude(x => x.TipoIntervencionPkNavigation)
             .Include(x => x.PaseguradoPkNavigation)
-            .ThenInclude(x=>x.DireccionPkNavigation)
+            .ThenInclude(x => x.DireccionPkNavigation)
+            .Include(x => x.PaseguradoPkNavigation)
+            .ThenInclude(x => x.NumeroTelefonoPkNavigation)
+            .Include(x => x.PafectadaPkNavigation)
+            .ThenInclude(x => x.NumeroTelefonoPkNavigation)
             .Include(x => x.PafectadaPkNavigation)
             .ThenInclude(x => x.DireccionPkNavigation)
+            .Include(x => x.PinterlocutorPkNavigation)
+            .ThenInclude(x => x.NumeroTelefonoPkNavigation)
+            .Include(x => x.PcontactoPkNavigation)
+            .ThenInclude(x => x.NumeroTelefonoPkNavigation)
+            .Include(x => x.PcontactoPkNavigation)
+            .ThenInclude(x => x.NumeroTelefono2PkNavigation)
+            .Include(x => x.PagentePolizaPkNavigation)
+            .ThenInclude(x => x.NumeroTelefonoPkNavigation)
             .Include(x => x.GremioPkNavigation)
             .FirstAsync(); 
     }

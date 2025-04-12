@@ -8,14 +8,14 @@
     </div>
 
     <div class="btn-container my-lg-3 text-center">
-        <button class="btn filter-btn active" data-rol="todos" onclick="filtrarUsuarios('todos')">Todos</button>
-        <button class="btn filter-btn" data-rol="Gestor" onclick="filtrarUsuarios('Gestor')">Gestores</button>
-        <button class="btn filter-btn" data-rol="Operario" onclick="filtrarUsuarios('Operario')">Operarios</button>
-        <button class="btn filter-btn" data-rol="Externo" onclick="filtrarUsuarios('Externo')">Externos</button>
-    </div>
+        <button class="btn filter-btn active" data-rol="todos" onclick="filtrarUsuarios('todos')">Todos (@Model.listUsuarios.Count())</button>
 
-    <div class="card-container">
-        <partial name="~/Views/Usuarios/_listaUsuarios.cshtml" model="@Model" />
+        @foreach (var rol in Model.listRoles)
+        {
+            <button class="btn filter-btn" onclick="filtrarUsuarios(@rol.RolPk)" data-rol="@rol.RolPk">
+                @rol.Rol (@Model.listUsuarios.Count(x => x.RolPk == rol.RolPk))
+            </button>
+        }
     </div>
 
     <div class="btn-container my-lg-3 text-center">
@@ -24,17 +24,35 @@
         </button>
     </div>
 
+    <div class="card-container">
+        <partial name="~/Views/Usuarios/_listaUsuarios.cshtml" model="@Model" />
+    </div>
+
+    <i class="fa-solid fa-circle-up fa-beat fa-2xl" id="btnScrollTop" onclick="scrollToTop()"></i>
 </div>
 
 @section Scripts {
     <script>
+        $(document).ready(function () {
+            // Mostrar u ocultar el botón según el scroll
+            window.addEventListener("scroll", function () {
+                var btn = document.getElementById("btnScrollTop");
+                btn.style.display = window.scrollY > 100 ? "block" : "none";
+                btn.style.marginBottom = (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) ? '2%' : '1%';
+            });
+        });
+        // Función para hacer scroll suave hacia arriba
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function filtrarUsuarios(filtro) {
             $(".filter-btn").removeClass("active");
             $(`.filter-btn[data-rol='${filtro}']`).addClass("active");
 
             $(".card-custom").each(function () {
                 var rol = $(this).data("rol");
-                if (filtro === "todos" || rol.includes(filtro)) {
+                if (filtro === "todos" || rol === filtro) {
                     $(this).show();
                 } else {
                     $(this).hide();
@@ -51,37 +69,28 @@
         });
 
         function verDetallesUsuario(usuarioPk) {
-            window.location.href = `/Usuarios/DetallesUsuario?UsuarioPk=${usuarioPk}`;
+            window.location.href = `/Usuarios/VerDetallesUsuario?UsuarioPk=${usuarioPk}`;
         }
 
         function guardarUsuario() {
+            // Verifica si el formulario es válido antes de hacer submit
+            if (!$("#formUsuario").valid()) {
+                return;
+            }
             const formData = $("#formUsuario").serialize();
-            $.post('/Usuarios/CreateEditUsuario', formData, function (res) {
-                if (res.status === "OK") {
+            $.post('/Usuarios/Guardar', formData, function (response) {
+                if (response.status === "OK") {
                     $('#modalLg').modal('hide');
+                    // Actualiza el contenido de la partial view del encargo
+                    $(".card-container").html(response.partial);
                     Swal.fire("Correcto", "Usuario guardado", "success").then(() => location.reload());
                 } else {
-                    Swal.fire("Error", res.message, "error");
+                    Swal.fire("Error", response.message, "error");
                 }
             });
         }
 
         function eliminarUsuario(usuarioPk) {
-            // Swal.fire({
-            //     title: "¿Estás seguro?",
-            //     text: "Eliminarás este usuario.",
-            //     icon: "warning",
-            //     showCancelButton: true,
-            //     confirmButtonText: "Sí, eliminar",
-            //     cancelButtonText: "Cancelar"
-            // }).then((result) => {
-            //     if (result.isConfirmed) {
-            //         $.post('/Usuarios/DeleteUsuario', { usuarioPk }, function (res) {
-            //             if (res.status === "OK") location.reload();
-            //             else Swal.fire("Error", res.message, "error");
-            //         });
-            //     }
-            // });
             Swal.fire({
                 title: "¿Estás seguro de eliminar este usuario?",
                 text: "No podrás revertir esta acción",
@@ -94,14 +103,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '@Url.Action("Delete", "Usuarios")', // Asegúrate de que la ruta es correcta
+                        url: '/Usuarios/Delete', // Asegúrate de que la ruta es correcta
                         type: 'POST',
                         data: { usuarioPk: usuarioPk},
                         dataType: 'json',
                         success: function(response) {
                             if (response.status === "OK") {
                                 // Actualiza el contenido de la partial view del encargo
-                                $(".notasEncargo").html(response.partial);
+                                $(".card-container").html(response.partial);
                                 Swal.fire({
                                     timer: 1500,
                                     title: "Eliminada",

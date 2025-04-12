@@ -19,6 +19,8 @@ public partial class OrderDato
 
     public DateTime? OrderDateClose { get; set; }
 
+    public string ActuacionAl { get; set; }
+
     public string RamoPoliza { get; set; }
 
     public bool Fraude { get; set; }

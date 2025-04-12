@@ -1,0 +1,104 @@
+﻿@model VM_listaTrabajos;
+
+<div class="encargo-body">
+@*     <div class="calendario-header" onclick="toggleNotasEncargoBody()">
+        <div class="header-left">
+            <span class="header-title">Trabajos</span>
+        </div>
+    </div> *@
+
+    <table class="table table-striped tabla-notas align-middle">
+        <thead class="thead-notas">
+            <tr class="filas-tablas-titulo filas-tablas">
+                <th class="filas-tablas-titulo">Estado</th>
+                <th class="filas-tablas-titulo">Obra/Siniestro</th>
+                <th class="filas-tablas-titulo">Fecha Asignada</th>
+                <th class="filas-tablas-titulo">Fecha Ejecucion</th>
+                <th class="filas-tablas-titulo">Operario</th>
+                <th class="filas-tablas-titulo">Gestor</th>
+                <th class="filas-tablas-titulo col-acciones ">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.listTrabajos.Count > 0)
+            {
+                foreach (var trabajo in Model.listTrabajos.OrderByDescending(x => x.FechaCreacion))
+                {
+                    <tr>
+                        <td class="filas-tablas">@trabajo.EstadoTrabajoPkNavigation.Estado</td>
+                        <td class="filas-tablas">@(trabajo.ObraPk == null ? trabajo.SiniestroPkNavigation?.DetallesSiniestroPkNavigation.NumeroSiniestro : trabajo.ObraPkNavigation?.Nombre)</td>
+                        <td class="filas-tablas">@trabajo.FechaAsignada</td>
+                        <td class="filas-tablas">@trabajo.FechaEjecucion</td>
+                        <td class="filas-tablas">@trabajo.UasignadoPkNavigation.Nombre</td>
+                        <td class="filas-tablas">@trabajo.UgestorPkNavigation.Nombre</td>
+                        <td class="filas-tablas">
+                            <i title="Ver Trabajo" class="icon fa-solid fa-pen-to-square" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEdit?TrabajoPk={trabajo.TrabajoPk}")', 'modalLgBody')"></i>
+                            <i title="Eliminar Trabajo" class="icon fa-solid fa-trash" onclick="eliminarTrabajo(@trabajo.TrabajoPk)"></i>
+                            <i title="Notas Trabajo" class="icon fa-solid fa-note-sticky" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetNotasTrabajo?Trabajo_PK={trabajo.TrabajoPk}")', 'modalLgBody')"></i>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted">No hay trabajos registrados</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+    function eliminarTrabajo(TrabajoPk) {
+        Swal.fire({
+            title: "¿Estás seguro de eliminar este trabajo?",
+            text: "No podrás revertir esta acción",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Eliminar",
+            cancelButtonText:"Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Trabajos/Eliminar', // Asegúrate de que la ruta es correcta
+                    type: 'POST',
+                    data: { TrabajoPk: TrabajoPk},
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === "OK") {
+                            Swal.fire({
+                                timer: 1500,
+                                title: "Eliminado",
+                                text: "El trabajo ha sido eliminado",
+                                icon: "success"
+                            }).then(() => {
+                                location.reload(); // Recarga para actualizar lista
+                            });
+                        }
+                        else
+                        {
+                            Swal.fire({
+                                timer: 1500,
+                                icon: "error",
+                                title: "ERROR",
+                                text: response.message,
+                                footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            timer: 1500,
+                            icon: "error",
+                            title: "ERROR",
+                            text: "El trabajo no ha sido eliminado",
+                            footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                        });
+                    }
+                });
+            }
+        });
+    }
+</script>

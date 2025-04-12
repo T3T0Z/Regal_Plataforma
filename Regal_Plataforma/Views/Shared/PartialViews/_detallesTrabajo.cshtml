@@ -1,0 +1,74 @@
+﻿@model VM_CreateEditTrabajo;
+
+<div class="modal-body">
+    <dl class="row">
+        <!-- Datos Básicos del Trabajo -->
+        <!-- Detalles de Obra o Siniestro (solo se muestra uno) -->
+        @if (Model.Trabajo.ObraPkNavigation != null)
+        {
+            <dt class="col-4">Obra</dt>
+            <dd class="col-8">
+                <strong>Nombre:</strong> @Model.Trabajo.ObraPkNavigation.Nombre <br />
+                <strong>Direccion:</strong> @Model.Trabajo.ObraPkNavigation.DireccionPkNavigation.NombreVia <br />
+            </dd>
+        }
+        else if (Model.Trabajo.SiniestroPkNavigation != null)
+        {
+            <dt class="col-4">Siniestro</dt>
+            <dd class="col-8">
+                <strong>NºSiniestro:</strong> @Model.Trabajo.SiniestroPkNavigation.DetallesSiniestroPkNavigation.NumeroSiniestro<br />
+                <strong>Direccion:</strong> @Model.Trabajo.SiniestroPkNavigation.OrderDatos.FirstOrDefault().DireccionPkNavigation.NombreVia <br />
+            </dd>
+        }
+        else
+        {
+            <dt class="col-4">Datos Asociados</dt>
+            <dd class="col-8">No se han asignado datos de obra ni siniestro.</dd>
+        }
+
+        <dt class="col-4 mb-0">Usuario Asignado</dt>
+        <dd class="col-8 mb-0">@Model.Trabajo.UasignadoPkNavigation?.Nombre</dd>
+
+        <dt class="col-4 mb-0">Gestor</dt>
+        <dd class="col-8 mb-0">@Model.Trabajo.UgestorPkNavigation?.Nombre</dd>
+
+        <dt class="col-4 mb-0">Estado Trabajo</dt>
+        <dd class="col-8 mb-0">@Model.Trabajo.EstadoTrabajoPkNavigation?.Estado</dd>
+
+        <dt class="col-4 mb-0">F. Asignada</dt>
+        <dt class="col-4 mb-0">F.Ejecución</dt>
+        <dt class="col-4 mb-0"></dt>
+
+        <dd class="col-4 mb-0">@Model.Trabajo.FechaAsignada.ToString("dd/MM/yyyy HH:mm")</dd>
+        <dd class="col-4 mb-0">@Model.Trabajo.FechaEjecucion?.ToString("dd/MM/yyyy HH:mm")</dd>
+        <dt class="col-4 mb-0"></dt>
+
+        <dt class="col-4 mb-0">F. Fin Asignada</dt>
+        <dt class="col-4 mb-0">F. Fin Ejecución</dt>
+        <dt class="col-4 mb-0"></dt>
+
+        <dd class="col-4 mb-0">@Model.Trabajo.FechaFinAsignada.ToString("dd/MM/yyyy HH:mm")</dd>
+        <dd class="col-4 mb-0">@Model.Trabajo.FechaFinEjecucion?.ToString("dd/MM/yyyy HH:mm")</dd>
+        <dt class="col-4 mb-0"></dt>
+
+        <dt class="col-4 mb-0">Descripción</dt>
+        <dd class="col-8 mb-0">@Model.Trabajo.Descripcion</dd>
+
+        <dt class="col-4 mb-0">Fotos</dt>
+        <dd class="col-8 mb-0">@(Model.Trabajo.Fotos ? "SI" : "NO")</dd>
+
+        <dt class="col-4 mb-0">Firma</dt>
+        <dd class="col-8 mb-0">@(Model.Trabajo.HayFirma ? $"SI ({Model.Trabajo.Dnifirma})" : "NO")</dd>
+
+        <dt class="col-4 mb-0">Daños</dt>
+        <dd class="col-8 mb-0">@(Model.Trabajo.HayDaños ? "SI" : "NO")</dd>
+
+        <dt class="col-4 mb-0">Urgencia</dt>
+        <dd class="col-8 mb-0">@(Model.Trabajo.Urgencia ? "SI" : "NO")</dd>
+
+    </dl>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn" data-dismiss="modal">Cerrar</button>
+</div>

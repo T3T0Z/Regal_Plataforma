@@ -560,10 +560,11 @@ public partial class REGAL_ASISTENCIAContext : DbContext
 
             entity.ToTable("ORDER_DATOS");
 
-            entity.Property(e => e.OrderDatosPk)
-                .ValueGeneratedNever()
-                .HasColumnName("OrderDatos_PK");
+            entity.Property(e => e.OrderDatosPk).HasColumnName("OrderDatos_PK");
             entity.Property(e => e.Activo).HasDefaultValue(true);
+            entity.Property(e => e.ActuacionAl)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.DireccionPk).HasColumnName("Direccion_PK");
             entity.Property(e => e.FechaCreacion)
                 .HasDefaultValueSql("(getdate())")
@@ -827,10 +828,12 @@ public partial class REGAL_ASISTENCIAContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.FechaEjecucion).HasColumnType("datetime");
+            entity.Property(e => e.FechaFinAsignada).HasColumnType("datetime");
+            entity.Property(e => e.FechaFinEjecucion).HasColumnType("datetime");
             entity.Property(e => e.ObraPk).HasColumnName("Obra_PK");
             entity.Property(e => e.SiniestroPk).HasColumnName("Siniestro_PK");
+            entity.Property(e => e.UasignadoPk).HasColumnName("UAsignado_PK");
             entity.Property(e => e.UgestorPk).HasColumnName("UGestor_PK");
-            entity.Property(e => e.UoperarioPk).HasColumnName("UOperario_PK");
 
             entity.HasOne(d => d.EstadoTrabajoPkNavigation).WithMany(p => p.Trabajos)
                 .HasForeignKey(d => d.EstadoTrabajoPk)
@@ -845,15 +848,15 @@ public partial class REGAL_ASISTENCIAContext : DbContext
                 .HasForeignKey(d => d.SiniestroPk)
                 .HasConstraintName("FK_TRABAJOS_SINIESTRO");
 
+            entity.HasOne(d => d.UasignadoPkNavigation).WithMany(p => p.TrabajoUasignadoPkNavigations)
+                .HasForeignKey(d => d.UasignadoPk)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TRABAJOS_USUARIOS2");
+
             entity.HasOne(d => d.UgestorPkNavigation).WithMany(p => p.TrabajoUgestorPkNavigations)
                 .HasForeignKey(d => d.UgestorPk)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TRABAJOS_USUARIOS");
-
-            entity.HasOne(d => d.UoperarioPkNavigation).WithMany(p => p.TrabajoUoperarioPkNavigations)
-                .HasForeignKey(d => d.UoperarioPk)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_TRABAJOS_USUARIOS1");
         });
 
         modelBuilder.Entity<Usuario>(entity =>

@@ -31,7 +31,7 @@
             var encargoPk = $(".selectGremioEncargo").data("encargopk");
 
             $.ajax({
-                url: '@Url.Action("ActualizarGremioEncargo", "Gestion")',  // Ajusta el nombre del controlador si es necesario
+                url: '/Encargos/ActualizarGremioEncargo',  // Ajusta el nombre del controlador si es necesario
                 type: 'POST',
                 dataType: 'json',
                 data: { OrderDatosPK: encargoPk, GremioPK: gremioPk },
@@ -75,7 +75,7 @@
             let formData = $("#formNotaEncargo").serialize();
 
             $.ajax({
-                url: '@Url.Action("CreateEditNotaEncargo", "Encargos")', // Asegúrate de que la ruta es correcta
+                url: '/Encargos/CreateEditNotaEncargo', // Asegúrate de que la ruta es correcta
                 type: 'POST',
                 data: formData,
                 success: function(response) {
@@ -126,7 +126,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '@Url.Action("DeleteNotaEncargo", "Encargos")', // Asegúrate de que la ruta es correcta
+                        url: '/Encargos/DeleteNotaEncargo', // Asegúrate de que la ruta es correcta
                         type: 'POST',
                         data: { NotasSiniestro_PK: NotasSiniestro_PK, Siniestro_PK: @Model.OrderDatos.OrderDatosPk },
                         success: function(response) {

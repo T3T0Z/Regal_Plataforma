@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace Regal_Plataforma.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Gestor")]
     public class ClientesController : Controller
     {
         private readonly INotasServices _notaService;
@@ -63,9 +63,15 @@ namespace Regal_Plataforma.Controllers
                 : await _cliente.UpdateClienteAsync(cliente);
 
             if (resultado == Resultado.KO)
+            {
+                Func_Comunes.LogsAplicacion(TiposLogs.ERROR, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Error actualizando cliente - Cliente_PK = {cliente.ClientePk}");
                 return Json(new { status = "KO", message = "Error actualizando cliente" });
+            }
             else
+            {
+                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Cliente actualizado correctamente - Cliente_PK = {cliente.ClientePk}");
                 return Json(new { status = "OK" });
+            }
         }
 
         public async Task<IActionResult> GetNotasCliente(int Cliente_PK)

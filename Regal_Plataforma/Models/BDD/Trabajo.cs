@@ -15,13 +15,17 @@ public partial class Trabajo
 
     public int UgestorPk { get; set; }
 
-    public int UoperarioPk { get; set; }
+    public int UasignadoPk { get; set; }
 
     public int EstadoTrabajoPk { get; set; }
 
     public DateTime FechaAsignada { get; set; }
 
+    public DateTime FechaFinAsignada { get; set; }
+
     public DateTime? FechaEjecucion { get; set; }
+
+    public DateTime? FechaFinEjecucion { get; set; }
 
     public string Descripcion { get; set; }
 
@@ -49,7 +53,7 @@ public partial class Trabajo
 
     public virtual Siniestro SiniestroPkNavigation { get; set; }
 
-    public virtual Usuario UgestorPkNavigation { get; set; }
+    public virtual Usuario UasignadoPkNavigation { get; set; }
 
-    public virtual Usuario UoperarioPkNavigation { get; set; }
+    public virtual Usuario UgestorPkNavigation { get; set; }
 }

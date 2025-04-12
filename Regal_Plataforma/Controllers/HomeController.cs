@@ -1,38 +1,42 @@
-using System;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Regal_Plataforma.Funciones;
 using Regal_Plataforma.Models;
+using Regal_Plataforma.Models.BDD;
+using System;
+using System.Diagnostics;
 
-namespace Regal_Plataforma.Controllers;
-
-
-[Authorize(Roles = "Administrador")]
-public class HomeController : Controller
+namespace Regal_Plataforma.Controllers
 {
-    public IActionResult Index()
+    [Authorize]
+    public class HomeController : Controller
     {
-        return View();
-    }
+        private readonly IArchivoService _archivos;
 
-    [AllowAnonymous]
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+        public HomeController(IArchivoService archivos)
+        {
+            _archivos = archivos;
+        }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    [AllowAnonymous]
-    public IActionResult Error()
-    {
-        string link = Url.Action("Index", "Home");
+        [AllowAnonymous]
+        public IActionResult Privacy()
+        {
+            return View();
+        }
 
-        if (User.IsInRole("Administrador"))
-            link = Url.Action("Index", "Gestion");
-        else if (!User.Identity.IsAuthenticated)
-            link = Url.Action("Index", "Login"); ;
+        [AllowAnonymous]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            string link = Url.Action("Index", "Home");
 
-        ViewData["RedirectUrl"] = link;
-        return View();
+            if (User.IsInRole("Gestor"))
+                link = Url.Action("Index", "Gestion");
+            else if (!User.Identity.IsAuthenticated)
+                link = Url.Action("Index", "Login"); ;
+
+            ViewData["RedirectUrl"] = link;
+            return View();
+        }
     }
 }

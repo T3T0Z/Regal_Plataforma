@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Components.RenderTree;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Regal_Plataforma.Funciones;
-using Regal_Plataforma.Models.BDD;
 using Regal_Plataforma.Models;
+using Regal_Plataforma.Models.BDD;
 using System.Security.Claims;
 
 namespace Regal_Plataforma.Controllers
 {
+    [Authorize(Roles = "Gestor")]
     public class EncargosController : Controller
     {
         private readonly REGAL_ASISTENCIAContext _dbContext;
@@ -41,8 +43,6 @@ namespace Regal_Plataforma.Controllers
 
         public IActionResult VerDetallesEncargo(int OrderDatosPK)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), "Entra en gestion encargos");
-
             VM_VerDetallesEncargo vm = new VM_VerDetallesEncargo();
 
             vm.OrderDatos = _orderdatos.GetOrderDatosByPK(OrderDatosPK).Result;
@@ -68,8 +68,10 @@ namespace Regal_Plataforma.Controllers
 
             if (resultado == Resultado.KO)
             {
+                Func_Comunes.LogsAplicacion(TiposLogs.ERROR, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Error actualizando gremio - OrderDatosPK = {OrderDatosPK} - GremioPK = {GremioPK}");
                 return Json(new { status = "KO", message = "Error actualizando gremio", partial = partialHtml });
             }
+            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Gremio actualizado correctamente - OrderDatosPK = {OrderDatosPK} - GremioPK = {GremioPK}");
             return Json(new { status = "OK", partial = partialHtml });
         }
 

@@ -206,4 +206,70 @@ public class NotasService : INotasServices
             .Include(x => x.UsuarioPkNavigation)
             .FirstOrDefaultAsync();
     }
+
+
+    public async Task<bool> CreateNotaTrabajoAsync(NotasTrabajo nota, int Usuario_PK)
+    {
+        try
+        {
+            nota.UsuarioPk = Usuario_PK;
+            nota.Activo = true;
+
+            await _dbContext.NotasTrabajos.AddAsync(nota);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> UpdateNotaTrabajoAsync(NotasTrabajo nota, int Usuario_PK)
+    {
+        try
+        {
+            var notaExistente = await _dbContext.NotasTrabajos.FirstOrDefaultAsync(x => x.NotasTrabajoPk == nota.NotasTrabajoPk);
+
+            if (notaExistente == null)
+                return false;
+
+            notaExistente.Nota = nota.Nota;
+            notaExistente.UsuarioPk = Usuario_PK;
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> DeleteNotaTrabajoAsync(int NotasTrabajo_PK)
+    {
+        try
+        {
+            var nota = await _dbContext.NotasTrabajos.FirstOrDefaultAsync(n => n.NotasTrabajoPk == NotasTrabajo_PK);
+
+            if (nota == null)
+                return false;
+
+            _dbContext.NotasTrabajos.Remove(nota);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<NotasTrabajo> GetNotaTrabajoByIdAsync(int NotasTrabajo_PK)
+    {
+        return await _dbContext.NotasTrabajos
+            .Where(n => n.NotasTrabajoPk == NotasTrabajo_PK)
+            .Include(x => x.UsuarioPkNavigation)
+            .FirstOrDefaultAsync();
+    }
 }

@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace Regal_Plataforma.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Gestor")]
     public class GestionController : Controller
     {
         // GET: GestionController

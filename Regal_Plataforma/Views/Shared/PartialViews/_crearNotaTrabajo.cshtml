@@ -1,0 +1,58 @@
+﻿@model VM_NotasTrabajo;
+<h5 class="modal-title" id="createNotaLabel">Nueva Nota</h5>
+<div class="modal-body">
+    <form id="formNotaTrabajo">
+        @Html.HiddenFor(x => x.Nota.NotasTrabajoPk)
+        @Html.HiddenFor(x => x.Nota.TrabajoPk)
+        @Html.HiddenFor(x => x.Nota.UsuarioPk)
+        <div class="mb-3">
+            <label for="textoNota" class="form-label">Nota</label>
+            @Html.TextAreaFor(x => x.Nota.Nota, new { @class = "form-control", id = "textoNota", rows = "3" })
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn" data-dismiss="modal">Cerrar</button>
+    <button type="button" class="btn" onclick="crearNota(@Model.Nota.TrabajoPk)">Guardar</button>
+</div>
+<script>
+
+    function crearNota(Trabajo_PK) {
+        let formData = $("#formNotaTrabajo").serialize();
+
+        $.ajax({
+            url: '/Trabajos/CreateEditNotaTrabajo', // Asegúrate de que la ruta es correcta
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.status === "OK") {
+                    swal.fire({
+                        timer: 1500,
+                        title: "CORRECTO",
+                        text: "La nota ha sido creada",
+                        icon: "success"
+                    });
+
+                    cargarPartialEnModal('modalLg', "/Trabajos/GetNotasTrabajo?Trabajo_PK=" + Trabajo_PK, 'modalLgBody');
+                } else {
+                    Swal.fire({
+                        timer: 1500,
+                        icon: "error",
+                        title: "ERROR",
+                        text: response.message,
+                        footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    timer: 1500,
+                    icon: "error",
+                    title: "ERROR",
+                    text: "Error creando nota",
+                    footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                });
+            }
+        });
+    }
+</script>

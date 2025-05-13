@@ -18,6 +18,7 @@ public class ObraService : IObraService
             .Include(x => x.DireccionPkNavigation)
             .Include(x => x.EstadoObraPkNavigation)
             .Include(x => x.UgestorPkNavigation)
+            .Include(x => x.Trabajos)
             .Include(x => x.NotasObras)
             .ThenInclude(x => x.UsuarioPkNavigation)
             .Where(x => x.Activo)

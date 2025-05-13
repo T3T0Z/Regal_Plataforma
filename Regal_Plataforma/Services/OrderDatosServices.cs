@@ -27,6 +27,9 @@ public class OrderDatosServices : IOrderDatosServices
             .ThenInclude(x => x.UsuarioPkNavigation)
 
             .Include(x => x.SiniestroPkNavigation)
+            .ThenInclude(x => x.Trabajos)
+
+            .Include(x => x.SiniestroPkNavigation)
             .ThenInclude(x => x.DetallesSiniestroPkNavigation)
 
             .Include(x => x.SiniestroPkNavigation)
@@ -104,6 +107,8 @@ public class OrderDatosServices : IOrderDatosServices
             .Include(x => x.PagentePolizaPkNavigation)
             .ThenInclude(x => x.NumeroTelefonoPkNavigation)
             .Include(x => x.GremioPkNavigation)
+            .Include(x => x.SiniestroPkNavigation)
+            .ThenInclude(x => x.Trabajos)
             .FirstAsync(); 
     }
 

@@ -1,11 +1,11 @@
 ﻿@model VM_DetallesUsuario;
 
 <div class="encargo-container">
-    <div class="encargo-header">
+    <div class="encargo-header" onclick="toggleUsuarioBody()">
         <span class="header-title">Información General</span>
     </div>
 
-    <div class="encargo-body">
+    <div id="detallesUsuario" class="encargo-body">
         <div class="info-line">
             <div class="info-col">
                 <span class="info-label">Usuario:</span>
@@ -33,3 +33,16 @@
         </div>
     </div>
 </div>
+<script>
+    function toggleUsuarioBody() {
+        const body = document.getElementById("detallesUsuario");
+
+        if (body.style.display === "none" || body.classList.contains("d-none")) {
+            body.style.display = "block";
+            body.classList.remove("d-none");
+        } else {
+            body.style.display = "none";
+            body.classList.add("d-none");
+        }
+    }
+</script>

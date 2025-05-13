@@ -11,22 +11,25 @@ namespace Regal_Plataforma.Controllers
     public class UsuariosController : Controller
     {
         private readonly IUsuarioServices _usuarios;
+        private readonly ICalendarServices _calendario;
         private readonly IRazorPartialToStringRenderer _renderer;
 
-        public UsuariosController(IUsuarioServices usuarios, IRazorPartialToStringRenderer renderer)
+        public UsuariosController(IUsuarioServices usuarios, ICalendarServices calendario, IRazorPartialToStringRenderer renderer)
         {
             _usuarios = usuarios;
+            _calendario = calendario;
             _renderer = renderer;
         }
 
         public async Task<IActionResult> Index()
         {
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, "Accediendo a la gestión de usuarios");
             var vm = new VM_GestionUsuarios
             {
                 listUsuarios = await _usuarios.GetUsuariosAsync(),
                 listRoles = await _usuarios.GetRolesAsync()
             };
-        
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Datos cargados - Total usuarios: {vm.listUsuarios.Count}, Total roles: {vm.listRoles.Count}");
             return View(vm);
         }
 
@@ -44,7 +47,7 @@ namespace Regal_Plataforma.Controllers
                     listNotas = usuario.NotasUsuarioUsuarioPkNavigations.ToList(),
                     Usuario_PK = UsuarioPk
                 },
-                Calendario = await _usuarios.GetYearCalendarViewModel(DateTime.Now.Year, UsuarioPk),
+                Calendario = await _calendario.GetYearCalendarViewModel(DateTime.Now.Year, UsuarioPk),
             };
 
             vm.Calendario.UsuarioPk = UsuarioPk;
@@ -76,50 +79,31 @@ namespace Regal_Plataforma.Controllers
 
         public async Task<IActionResult> Guardar(Usuario usuario)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.Identity.Name, $"Creando/Actualizando usuario con PK = {usuario.UsuarioPk}");
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Creando/Actualizando usuario con PK = {usuario.UsuarioPk}");
             var result = await _usuarios.CreateUpdateUsuarioAsync(usuario);
             if (result == Resultado.OK)
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.Identity.Name, $"Usuario con PK = {usuario.UsuarioPk} guardado correctamente");
+                await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Usuario con PK = {usuario.UsuarioPk} guardado correctamente");
                 return Json(new { status = "OK" });
             }
 
-            Func_Comunes.LogsAplicacion(TiposLogs.ERROR, User.Identity.Name, $"Error al guardar el usuario con PK = {usuario.UsuarioPk}");
+            await AppLogger.WriteAsync(LogType.Error, User.Identity.Name, $"Error al guardar el usuario con PK = {usuario.UsuarioPk}");
             return Json(new { status = "KO", message = "Error al guardar el usuario" });
         }
 
         public async Task<IActionResult> Delete(int usuarioPk)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.Identity.Name, $"Eliminando usuario con PK = {usuarioPk}");
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Eliminando usuario con PK = {usuarioPk}");
             var result = await _usuarios.DeleteUsuarioAsync(usuarioPk);
             if (result == Resultado.OK)
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.Identity.Name, $"Usuario con PK = {usuarioPk} eliminado correctamente");
+                await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Usuario con PK = {usuarioPk} eliminado correctamente");
                 return Json(new { status = "OK" });
             }
 
-            Func_Comunes.LogsAplicacion(TiposLogs.ERROR, User.Identity.Name, $"Error al eliminar el usuario con PK = {usuarioPk}");
+            await AppLogger.WriteAsync(LogType.Error, User.Identity.Name, $"Error al eliminar el usuario con PK = {usuarioPk}");
             return Json(new { status = "KO", message = "El usuario no ha sido eliminado" });
         }
 
-        // Partial view para el calendario anual.
-        public ActionResult YearCalendarPartial(int UsuarioPk, int year = 2025)
-        {
-            VM_CalendarioUsuario vm = _usuarios.GetYearCalendarViewModel(year, UsuarioPk).Result;
-
-            var partial = _renderer.RenderPartialToStringAsync("~/Views/Shared/PartialViews/_calendarioUsuario.cshtml", vm);
-
-            return Json(new { status = "OK", partial = partial });
-        }
-
-        // Partial view para el calendario mensual.
-        public ActionResult MonthCalendarPartial(int year, int month, int UsuarioPk)
-        {
-            VM_Month vm = _usuarios.GetMonthCalendarViewModel(year, month, UsuarioPk).Result;
-
-            var partial = _renderer.RenderPartialToStringAsync("~/Views/Shared/PartialViews/_calendarioMensualUsuario.cshtml", vm);
-
-            return Json(new { status = "OK", partial = partial });
-        }
     }
 }

@@ -26,10 +26,12 @@ namespace Regal_Plataforma.Controllers
 
         public async Task<IActionResult> Index()
         {
-            VM_GestionClientes vm = new VM_GestionClientes();
-
-            vm.listClientes = await _cliente.GetClientesAsync();
-
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, "Accediendo a la gestión de clientes");
+            VM_GestionClientes vm = new VM_GestionClientes
+            {
+                listClientes = await _cliente.GetClientesAsync()
+            };
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Datos cargados - Total clientes: {vm.listClientes.Count}");
             return View(vm);
         }
 
@@ -56,21 +58,20 @@ namespace Regal_Plataforma.Controllers
 
         public async Task<JsonResult> Guardar(Cliente cliente)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Entra en guardar cliente - Cliente_PK = {cliente.ClientePk}");
-
-            Resultado resultado = cliente.ClientePk == 0
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Guardando cliente - ClientePK: {cliente.ClientePk}, Nombre: {cliente.Nombre}");
+            var resultado = cliente.ClientePk == 0
                 ? await _cliente.CreateClienteAsync(cliente)
                 : await _cliente.UpdateClienteAsync(cliente);
 
-            if (resultado == Resultado.KO)
+            if (resultado == Resultado.OK)
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.ERROR, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Error actualizando cliente - Cliente_PK = {cliente.ClientePk}");
-                return Json(new { status = "KO", message = "Error actualizando cliente" });
+                await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Cliente guardado correctamente - ClientePK: {cliente.ClientePk}");
+                return Json(new { status = "OK" });
             }
             else
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Cliente actualizado correctamente - Cliente_PK = {cliente.ClientePk}");
-                return Json(new { status = "OK" });
+                await AppLogger.WriteAsync(LogType.Error, User.Identity.Name, $"Error guardando cliente - ClientePK: {cliente.ClientePk}");
+                return Json(new { status = "KO", message = "Error guardando cliente" });
             }
         }
 
@@ -103,7 +104,7 @@ namespace Regal_Plataforma.Controllers
 
         public async Task<JsonResult> CreateEditNotaCliente (VM_NotasCliente notasCliente)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Cliente - NotasClientePk = {notasCliente.Nota.NotasClientesPk}");
+            await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Cliente - NotasClientePk = {notasCliente.Nota.NotasClientesPk}");
 
             NotasCliente nota = notasCliente.Nota;
 
@@ -120,19 +121,19 @@ namespace Regal_Plataforma.Controllers
 
                 string partialHtml = _renderer.RenderPartialToStringAsync("~/Views/Shared/PartialViews/_notasCliente.cshtml", vm);
 
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Cliente correcto - NotasClientePk = {notasCliente.Nota.NotasClientesPk}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Cliente correcto - NotasClientePk = {notasCliente.Nota.NotasClientesPk}");
                 return Json(new { status = "OK", partial = partialHtml });
             }
             else
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Cliente incorrecto - NotasClientePk = {nota.NotasClientesPk}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Cliente incorrecto - NotasClientePk = {nota.NotasClientesPk}");
                 return Json(new { status = "KO", message = "Error editando nota" });
             }
         }
 
         public async Task<JsonResult> DeleteNotaCliente (int NotasCliente_PK, int Cliente_PK)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Cliente - NotasClientePk = {NotasCliente_PK}");
+            await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Cliente - NotasClientePk = {NotasCliente_PK}");
             bool success = await _notaService.DeleteNotaClienteAsync(NotasCliente_PK);
             if (success)
             {
@@ -143,12 +144,12 @@ namespace Regal_Plataforma.Controllers
 
                 string partialHtml = _renderer.RenderPartialToStringAsync("~/Views/Shared/PartialViews/_notasCliente.cshtml", vm);
 
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Cliente correcto - NotasClientePk = {NotasCliente_PK}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Cliente correcto - NotasClientePk = {NotasCliente_PK}");
                 return Json(new { status = "OK", partial = partialHtml });
             }
             else
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Cliente incorrecto - NotasClientePk = {NotasCliente_PK}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Cliente incorrecto - NotasClientePk = {NotasCliente_PK}");
                 return Json(new { status = "KO", message = "Error eliminando nota" });
             }
         }

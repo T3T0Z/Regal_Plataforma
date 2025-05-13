@@ -59,9 +59,13 @@
                             <strong class="card-enunciados">Fecha Siniestro:</strong>
                             <span class="card-encargos">@order.SiniestroPkNavigation.DetallesSiniestroPkNavigation.FechaOcurrencia?.ToString("dd/MM/yyyy")</span>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-4">
                             <strong class="card-enunciados">Dirección:</strong>
                             <span class="card-encargos text-truncate">@order.DireccionPkNavigation.NombreVia</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong class="card-enunciados" style="color:red;">Trabajos:</strong>
+                            <span class="card-encargos text-truncate" style="color:red;">@order.SiniestroPkNavigation.Trabajos.Count()</span>
                         </div>
                     </div>
 

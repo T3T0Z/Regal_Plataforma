@@ -1,0 +1,65 @@
+﻿@model VM_VerDetallesObra;
+
+<div class="encargo-container">
+    <div class="encargo-header" onclick="toggleEncargoBody()">
+        <div class="header-left d-none d-xl-block">
+            <span class="header-title" id="InfoGeneralEncargos">Información General de la Obra</span>
+        </div>
+        <div class="header-right" onclick="event.stopPropagation()">
+            <button class="btn-header-white mx-2" onclick="cargarPartialEnModal('modalLg', '/Obras/GetCreateEdit?ObraPk=@Model.Obra.ObraPk', 'modalLgBody')"> Editar Obra </button>
+            <button class="btn-header-white mx-2" onclick="cargarPartialEnModal('modalLg', '/Archivos/Galeria?entidad=Obra&entidadPk=@Model.Obra.ObraPk', 'modalLgBody')"> Ver Archivos </button>
+        </div>
+    </div>
+
+    <div class="encargo-body" id="encargoBody">
+
+        @* OBRA *@
+        <div class="section-title mt-0">Obra</div>
+        <div class="line-separator"></div>
+
+        <div class="info-line">
+            <div class="info-col">
+                <span class="info-label">Nombre:</span>
+                <span>@Model.Obra.Nombre</span>
+            </div>
+            <div class="info-col">
+                <span class="info-label">Cliente:</span>
+                <span>@Model.Obra.ClientePkNavigation.Nombre</span>
+            </div>
+            <div class="info-col">
+                <span class="info-label">Estado:</span>
+                <span>@Model.Obra.EstadoObraPkNavigation.Estado</span>
+            </div>
+        </div>
+
+        <div class="info-line">
+            <div class="info-col">
+                <span class="info-label">Fecha Asignada:</span>
+                <span>@Model.Obra.FechaAsignada</span>
+            </div>
+            <div class="info-col">
+                <span class="info-label">Fecha Fin Asignada:</span>
+                <span>@Model.Obra.FechaFinAsignada</span>
+            </div>
+        </div>
+
+        <div class="info-line">
+            <div class="info-col">
+                <span class="info-label">Dirección:</span>
+                <span>@Model.Obra.DireccionPkNavigation.NombreVia</span>
+            </div>
+        </div>
+
+        @*         <div class="info-line">
+            <div class="info-col">
+                <span class="info-label">Fecha (real):</span>
+                <span>@Model.Obra.Fecha</span>
+            </div>
+            <div class="info-col">
+                <span class="info-label">Fecha Fin (real):</span>
+                <span>@Model.Obra.FechaFin</span>
+            </div>
+        </div> *@
+
+    </div>
+</div>

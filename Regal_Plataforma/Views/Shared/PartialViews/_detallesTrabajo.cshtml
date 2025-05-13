@@ -1,29 +1,29 @@
 ﻿@model VM_CreateEditTrabajo;
-
 <div class="modal-body">
-    <dl class="row">
-        <!-- Datos Básicos del Trabajo -->
-        <!-- Detalles de Obra o Siniestro (solo se muestra uno) -->
-        @if (Model.Trabajo.ObraPkNavigation != null)
+    <dl class="row gx-2 gy-0">
+        @if(Model.Trabajo.EstadoTrabajoPk != 4)
         {
-            <dt class="col-4">Obra</dt>
-            <dd class="col-8">
-                <strong>Nombre:</strong> @Model.Trabajo.ObraPkNavigation.Nombre <br />
-                <strong>Direccion:</strong> @Model.Trabajo.ObraPkNavigation.DireccionPkNavigation.NombreVia <br />
-            </dd>
-        }
-        else if (Model.Trabajo.SiniestroPkNavigation != null)
-        {
-            <dt class="col-4">Siniestro</dt>
-            <dd class="col-8">
-                <strong>NºSiniestro:</strong> @Model.Trabajo.SiniestroPkNavigation.DetallesSiniestroPkNavigation.NumeroSiniestro<br />
-                <strong>Direccion:</strong> @Model.Trabajo.SiniestroPkNavigation.OrderDatos.FirstOrDefault().DireccionPkNavigation.NombreVia <br />
-            </dd>
-        }
-        else
-        {
-            <dt class="col-4">Datos Asociados</dt>
-            <dd class="col-8">No se han asignado datos de obra ni siniestro.</dd>
+            @if (Model.Trabajo.ObraPkNavigation != null)
+            {
+                <dt class="col-4">Obra</dt>
+                <dd class="col-8">
+                    <strong>Nombre:</strong> @Model.Trabajo.ObraPkNavigation.Nombre <br />
+                    <strong>Direccion:</strong> @Model.Trabajo.ObraPkNavigation.DireccionPkNavigation.NombreVia <br />
+                </dd>
+            }
+            else if (Model.Trabajo.SiniestroPkNavigation != null)
+            {
+                <dt class="col-4">Siniestro</dt>
+                <dd class="col-8">
+                    <strong>NºSiniestro:</strong> @Model.Trabajo.SiniestroPkNavigation.DetallesSiniestroPkNavigation.NumeroSiniestro<br />
+                    <strong>Direccion:</strong> @Model.Trabajo.SiniestroPkNavigation.OrderDatos.FirstOrDefault().DireccionPkNavigation.NombreVia <br />
+                </dd>
+            }
+            else
+            {
+                <dt class="col-4">Datos Asociados</dt>
+                <dd class="col-8">No se han asignado datos de obra ni siniestro.</dd>
+            }
         }
 
         <dt class="col-4 mb-0">Usuario Asignado</dt>
@@ -31,6 +31,12 @@
 
         <dt class="col-4 mb-0">Gestor</dt>
         <dd class="col-8 mb-0">@Model.Trabajo.UgestorPkNavigation?.Nombre</dd>
+
+        @if(Model.Trabajo.EstadoTrabajoPk != 4)
+        {
+            <dt class="col-4 mb-0">Urgencia</dt>
+            <dd class="col-8 mb-0">@(Model.Trabajo.Urgencia ? "SI" : "NO")</dd>
+        }
 
         <dt class="col-4 mb-0">Estado Trabajo</dt>
         <dd class="col-8 mb-0">@Model.Trabajo.EstadoTrabajoPkNavigation?.Estado</dd>
@@ -51,24 +57,181 @@
         <dd class="col-4 mb-0">@Model.Trabajo.FechaFinEjecucion?.ToString("dd/MM/yyyy HH:mm")</dd>
         <dt class="col-4 mb-0"></dt>
 
-        <dt class="col-4 mb-0">Descripción</dt>
-        <dd class="col-8 mb-0">@Model.Trabajo.Descripcion</dd>
+        <dt class="col-4 mb-0">Duracion Real</dt>
+        <dd class="col-8 mb-0">@(!string.IsNullOrEmpty(Model.Trabajo.TiempoTransacurridoTrabajo)? Model.Trabajo.TiempoTransacurridoTrabajo + " minutos" : "----------")</dd>
+        
+        @if(Model.Trabajo.EstadoTrabajoPk != 4)
+        {
+            <dt class="col-4 mb-0">Descripción Administrador</dt>
+            <dd class="col-8 mb-0">@Model.Trabajo.DescripcionAdministrador</dd>
+        }
 
-        <dt class="col-4 mb-0">Fotos</dt>
-        <dd class="col-8 mb-0">@(Model.Trabajo.Fotos ? "SI" : "NO")</dd>
+        <dt class="col-4 mb-0">Descripción Trabajo</dt>
+        <dd class="col-8 mb-0">@Model.Trabajo.DescripcionTrabajo</dd>
+                
+        @if(Model.Trabajo.EstadoTrabajoPk != 4)
+        {
+            <dt class="col-4 mb-0">Hay Fotos</dt>
+            <dd class="col-8 mb-0">@(Model.Trabajo.Fotos ? "SI" : "NO")</dd>
 
-        <dt class="col-4 mb-0">Firma</dt>
-        <dd class="col-8 mb-0">@(Model.Trabajo.HayFirma ? $"SI ({Model.Trabajo.Dnifirma})" : "NO")</dd>
+            @if (Model.Trabajo.SiniestroPk != null)
+            {
+                <dt class="col-4 mb-0">Hay Firma</dt>
+                <dd class="col-8 mb-0">@(Model.Trabajo.HayFirma ? $"SI ({Model.Trabajo.Dnifirma})" : "NO")</dd>
 
-        <dt class="col-4 mb-0">Daños</dt>
-        <dd class="col-8 mb-0">@(Model.Trabajo.HayDaños ? "SI" : "NO")</dd>
+                <dt class="col-4 mb-0">Hay Daños</dt>
+                <dd class="col-8 mb-0">@(Model.Trabajo.HayDaños ? "SI" : "NO")</dd>
 
-        <dt class="col-4 mb-0">Urgencia</dt>
-        <dd class="col-8 mb-0">@(Model.Trabajo.Urgencia ? "SI" : "NO")</dd>
+                <dt class="col-4 mb-0">Daños</dt>
+                <dd class="col-8 mb-0">@Model.Trabajo.Daños</dd>
+            }
 
+            <dt class="col-4 mb-0">Hay Descansos</dt>
+            <dd class="col-8 mb-0">@(Model.Trabajo.DescansosTrabajos.Count() == 0 ? "NO" : "SI")</dd>
+
+            <dt class="col-4 mb-0">Duración Descansos</dt>
+            <dd class="col-8 mb-0">@(Model.Trabajo.TiempoTranscurridoDescansos == null ? "" : Model.Trabajo.TiempoTranscurridoDescansos + " minutos")</dd>
+        }
     </dl>
+    @if (Model.Trabajo.UbicacionesTrabajos?.Any() == true)
+{
+    <div class="mt-3">
+        <div id="mapAll"
+             class="w-100"
+             style="height:380px;"
+             data-spots='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                 Model.Trabajo.UbicacionesTrabajos
+                       .GroupBy(u => $"{u.Latitude}|{u.Longitude}")
+                       .Select(g => new {
+                           lat    = g.First().Latitude,
+                           lng    = g.First().Longitude,
+                           fechas = g.Select(x => x.FechaCreacion.ToString("HH:mm"))
+                       })
+             ))'>
+        </div>
+    </div>
+}
+    else
+    {
+        <p class="text-center text-muted fst-italic mt-3">
+            No hay ubicaciones registradas.
+        </p>
+    }
 </div>
-
 <div class="modal-footer">
+    <button type="button" class="btn mx-sm-1" onclick="cargarPartialEnModal('modalLg', '/Archivos/Galeria?entidad=Trabajo&entidadPk=@Model.Trabajo.TrabajoPk', 'modalLgBody')"> Ver Archivos </button>
     <button type="button" class="btn" data-dismiss="modal">Cerrar</button>
 </div>
+
+<script>
+(() => {
+
+  let map = null;          // única instancia
+
+  function destroyMap () {
+      if (map) {
+          const div = map.getContainer();
+          map.remove();
+          delete div._leaflet_id;
+          map = null;
+      }
+  }
+
+  function createMap () {
+      const div = document.getElementById('mapAll');
+      if (!div) return;
+
+      destroyMap();                           // limpieza total
+
+      const spots = JSON.parse(div.dataset.spots);  // ← datos frescos
+
+      map = L.map(div,{zoomControl:false}).setView([0,0],2);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  {maxZoom:19}).addTo(map);
+
+      const bounds = [];
+
+      spots.forEach(pt=>{
+          L.circleMarker([pt.lat,pt.lng],{radius:8})
+           .bindTooltip(pt.fechas.join('<br>'),
+                         {direction:'top',offset:[0,-4]}).addTo(map);
+          bounds.push([pt.lat,pt.lng]);
+      });
+
+      bounds.length > 1 ? map.fitBounds(bounds,{padding:[20,20]})
+                        : bounds.length && map.setView(bounds[0],16);
+  }
+
+  /* registrar una sola vez */
+  $(document)
+     .off('.leaf-map')                                // evita duplicados
+     .on('shown.bs.modal.leaf-map',  '#modalLg', createMap)
+     .on('hidden.bs.modal.leaf-map', '#modalLg', destroyMap);
+
+})();
+</script>
+@* <script>
+    (() => {
+    /* 1 · Pasamos los datos crudos (sin agrupar) ------------------------- */
+    const rawSpots = [
+        @foreach (var u in Model.Trabajo.UbicacionesTrabajos)
+        {
+                <text>{ lat:@u.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                        lng:@u.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                        fecha:"@u.FechaCreacion.ToString("HH:mm")" },</text>
+        }
+    ];
+
+    /* 2 · Agrupamos por lat/lng ----------------------------------------- */
+    const grouped = new Map();                      // key -> {lat,lng,fechas[]}
+
+    rawSpots.forEach(s => {
+        const key = `${s.lat}|${s.lng}`;            // combinación única
+        if (!grouped.has(key)){
+            grouped.set(key, { lat:s.lat, lng:s.lng, fechas:[s.fecha] });
+        } else {
+            grouped.get(key).fechas.push(s.fecha);
+        }
+    });
+
+    /* 3 · Convertimos a array listo para Leaflet ------------------------ */
+    const spots = Array.from(grouped.values());     // [{lat,lng,fechas:[...]}]
+
+    let map;
+
+        /* ---------- crea el mapa cuando se abra la modal --------------- */
+        $(document).on('shown.bs.modal','#modalLg', function () {
+
+            /* si ya existe, no volver a crear */
+            if (!document.getElementById('mapAll')._leaflet_id) {
+
+                 window._mapAllLoaded = true; 
+
+                map = L.map('mapAll',{zoomControl:false}).setView([0,0],2);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(map);
+
+                const bounds = [];
+
+                spots.forEach(pt=>{
+                        const tooltipText = pt.fechas.join("<br>");    // una línea por hora
+                        L.circleMarker([pt.lat, pt.lng], { radius:8 })
+                         .bindTooltip(tooltipText,
+                                      { direction:'top', offset:[0,-4] })
+                         .addTo(map);
+
+                        bounds.push([pt.lat, pt.lng]);
+                });
+
+                if (bounds.length > 1)  map.fitBounds(bounds,{padding:[20,20]});
+                else if(bounds.length)  map.setView(bounds[0],16);
+            }
+        });
+
+        /* ---- al cerrar la modal eliminamos el mapa y liberamos el div --- */
+        $(document).on('hidden.bs.modal', '#modalLg', function () {
+            if (map) { map.remove(); map = null; }
+        });
+    })();
+</script>
+ *@

@@ -5,6 +5,7 @@
         @Html.HiddenFor(x=>x.Nota.NotasObrasPk)
         @Html.HiddenFor(x=>x.Nota.ObraPk)
         @Html.HiddenFor(x=>x.Nota.UsuarioPk)
+        @Html.HiddenFor(x=>x.Obra_PK)
         <div class="mb-3">
             <label for="textoNota" class="form-label">Nota</label>
             @Html.TextAreaFor(x => x.Nota.Nota, new { @class = "form-control", id = "textoNota", rows = "3" })

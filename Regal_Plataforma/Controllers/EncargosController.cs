@@ -29,50 +29,47 @@ namespace Regal_Plataforma.Controllers
             _notaService = notasservices;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), "Entra en gestion encargos");
-
-            VM_GestionEncargos vm = new VM_GestionEncargos();
-
-            vm.listOrderDatos = _orderdatos.GetOrderDatos().Result;
-            vm.listGremios = _gremios.GetGremiosAsync().Result;
-
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, "Accediendo a la gestión de encargos");
+            VM_GestionEncargos vm = new VM_GestionEncargos
+            {
+                listOrderDatos = _orderdatos.GetOrderDatos().Result,
+                listGremios = _gremios.GetGremiosAsync().Result
+            };
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Datos cargados - Total encargos: {vm.listOrderDatos.Count}, Total gremios: {vm.listGremios.Count}");
             return View(vm);
         }
 
-        public IActionResult VerDetallesEncargo(int OrderDatosPK)
+        public async Task<IActionResult> VerDetallesEncargo(int OrderDatosPK)
         {
-            VM_VerDetallesEncargo vm = new VM_VerDetallesEncargo();
-
-            vm.OrderDatos = _orderdatos.GetOrderDatosByPK(OrderDatosPK).Result;
-            vm.listGremios = _gremios.GetGremiosAsync().Result;
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Accediendo a los detalles del encargo - OrderDatosPK: {OrderDatosPK}");
+            VM_VerDetallesEncargo vm = new VM_VerDetallesEncargo
+            {
+                OrderDatos = _orderdatos.GetOrderDatosByPK(OrderDatosPK).Result,
+                listGremios = _gremios.GetGremiosAsync().Result
+            };
             vm.Notas.Encargo_PK = OrderDatosPK;
             vm.Notas.listNotas = vm.OrderDatos.SiniestroPkNavigation.NotasSiniestros.ToList();
-
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Detalles del encargo cargados - OrderDatosPK: {OrderDatosPK}, Gremios disponibles: {vm.listGremios.Count}");
             return View(vm);
         }
 
         public async Task<IActionResult> ActualizarGremioEncargo(int OrderDatosPK, int GremioPK)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Entra en actualizar Gremio Encargo - OrderDatosPK = {OrderDatosPK} - GremioPK = {GremioPK}");
-
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Actualizando gremio del encargo - OrderDatosPK: {OrderDatosPK}, GremioPK: {GremioPK}");
             var resultado = await _orderdatos.SetGremioAsync(OrderDatosPK, GremioPK);
 
-            VM_VerDetallesEncargo vm = new VM_VerDetallesEncargo();
-
-            vm.OrderDatos = await _orderdatos.GetOrderDatosByPK(OrderDatosPK);
-            vm.listGremios = await _gremios.GetGremiosAsync();
-
-            string partialHtml = _renderer.RenderPartialToStringAsync("~/Views/Shared/PartialViews/_detallesEncargo.cshtml", vm);
-
-            if (resultado == Resultado.KO)
+            if (resultado == Resultado.OK)
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.ERROR, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Error actualizando gremio - OrderDatosPK = {OrderDatosPK} - GremioPK = {GremioPK}");
-                return Json(new { status = "KO", message = "Error actualizando gremio", partial = partialHtml });
+                await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Gremio actualizado correctamente - OrderDatosPK: {OrderDatosPK}, GremioPK: {GremioPK}");
+                return Json(new { status = "OK" });
             }
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Gremio actualizado correctamente - OrderDatosPK = {OrderDatosPK} - GremioPK = {GremioPK}");
-            return Json(new { status = "OK", partial = partialHtml });
+            else
+            {
+                await AppLogger.WriteAsync(LogType.Error, User.Identity.Name, $"Error actualizando gremio - OrderDatosPK: {OrderDatosPK}, GremioPK: {GremioPK}");
+                return Json(new { status = "KO", message = "Error actualizando gremio" });
+            }
         }
 
         public async Task<IActionResult> GetCreateEditNotaEncargo(int NotasEncargo_PK, int Siniestro_PK)
@@ -91,7 +88,7 @@ namespace Regal_Plataforma.Controllers
 
         public async Task<JsonResult> CreateEditNotaEncargo(VM_NotasEncargo notasSiniestro)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Siniestro - NotasSiniestroPk = {notasSiniestro.Nota.NotasSiniestroPk}");
+            await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Siniestro - NotasSiniestroPk = {notasSiniestro.Nota.NotasSiniestroPk}");
 
             NotasSiniestro nota = notasSiniestro.Nota;
 
@@ -108,19 +105,19 @@ namespace Regal_Plataforma.Controllers
 
                 string partialHtml = _renderer.RenderPartialToStringAsync("~/Views/Shared/PartialViews/_notasEncargo.cshtml", vm);
 
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Siniestro correcto - NotasSiniestroPk = {notasSiniestro.Nota.NotasSiniestroPk}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Siniestro correcto - NotasSiniestroPk = {notasSiniestro.Nota.NotasSiniestroPk}");
                 return Json(new { status = "OK", partial = partialHtml });
             }
             else
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Siniestro incorrecto - NotasSiniestroPk = {nota.NotasSiniestroPk}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Siniestro incorrecto - NotasSiniestroPk = {nota.NotasSiniestroPk}");
                 return Json(new { status = "KO", message = "Error editando nota" });
             }
         }
 
         public async Task<JsonResult> DeleteNotaEncargo(int NotasSiniestro_PK, int Siniestro_PK)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Siniestro - NotasSiniestro_PK = {NotasSiniestro_PK}");
+            await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Siniestro - NotasSiniestro_PK = {NotasSiniestro_PK}");
             bool success = await _notaService.DeleteNotaSiniestroAsync(NotasSiniestro_PK);
             if (success)
             {
@@ -131,12 +128,12 @@ namespace Regal_Plataforma.Controllers
 
                 string partialHtml = _renderer.RenderPartialToStringAsync("~/Views/Shared/PartialViews/_notasEncargo.cshtml", vm);
 
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Siniestro correcto - NotasSiniestro_PK = {NotasSiniestro_PK}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Siniestro correcto - NotasSiniestro_PK = {NotasSiniestro_PK}");
                 return Json(new { status = "OK", partial = partialHtml });
             }
             else
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Siniestro incorrecto - NotasSiniestro_PK = {NotasSiniestro_PK}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Siniestro incorrecto - NotasSiniestro_PK = {NotasSiniestro_PK}");
                 return Json(new { status = "KO", message = "Error eliminando nota" });
             }
         }

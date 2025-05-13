@@ -62,6 +62,13 @@ namespace Regal_Plataforma.Models
         public List<EstadoObra> listEstadosObras { get; set; }
     }
 
+    public class VM_VerDetallesObra
+    {
+        public Obra Obra { get; set; }
+        public VM_NotasObra Notas { get; set; } = new VM_NotasObra();
+        public VM_Calendario Calendario { get; set; } = new VM_Calendario();
+    }
+
     public class VM_NotasObra
     {
         public List<NotasObra> listNotas { get; set; }
@@ -74,6 +81,7 @@ namespace Regal_Plataforma.Models
         public List<Usuario> listUsuarios { get; set; } = new();
         public List<Role> listRoles { get; set; } = new();
     }
+
     public class VM_CreateUpdateUsuario
     {
         public Usuario Usuario { get; set; } = new();
@@ -84,7 +92,7 @@ namespace Regal_Plataforma.Models
     {
         public Usuario Usuario { get; set; }
         public VM_NotasUsuario Notas { get; set; } = new VM_NotasUsuario();
-        public VM_CalendarioUsuario Calendario { get; set; } = new VM_CalendarioUsuario();
+        public VM_Calendario Calendario { get; set; } = new VM_Calendario();
     }
 
     public class VM_NotasUsuario
@@ -118,15 +126,17 @@ namespace Regal_Plataforma.Models
         public int Trabajo_PK { get; set; }
     }
 
-    public class VM_CalendarioUsuario
+    public class VM_Calendario
     {
         public int Year { get; set; }
-        public int UsuarioPk { get; set; }
+        public int? UsuarioPk { get; set; }
+        public int? ObraPk { get; set; }
+        public int? SiniestroPk { get; set; }
         public List<VM_Month> Calendars { get; set; }
         // Nueva propiedad para introducir los días festivos.
         public List<DateTime> Holidays { get; set; }
 
-        public VM_CalendarioUsuario()
+        public VM_Calendario()
         {
             Calendars = new List<VM_Month>();
         }
@@ -134,7 +144,9 @@ namespace Regal_Plataforma.Models
 
     public class VM_Month
     {
-        public int UsuarioPk { get; set; }
+        public int? UsuarioPk { get; set; }
+        public int? ObraPk { get; set; }
+        public int? SiniestroPk { get; set; }
         public int Year { get; set; }
         public int Month { get; set; }
         public List<VM_Week> Weeks { get; set; }
@@ -142,6 +154,8 @@ namespace Regal_Plataforma.Models
         public List<DateTime> Holidays { get; set; }
         // Indica si el día es el actual
         public bool actualMonth { get; set; }
+        // Indica el numero total de horas trabajadas NO descansos
+        public string HorasTotales { get; set; }
 
         public VM_Month()
         {
@@ -170,12 +184,15 @@ namespace Regal_Plataforma.Models
         public bool actualDay { get; set; }
         // Lista de trabajos asignados a este día.
         public VM_listaTrabajos Trabajos { get; set; }
+        // Indica el numero total de horas trabajadas NO descansos
+        public string HorasTotales { get; set; }
 
         public VM_Day()
         {
             Trabajos = new VM_listaTrabajos();
         }
     }
+
     public class VM_GaleriaArchivos
     {
         public string Entidad { get; set; }            // Ej: "Obra", "Cliente", "Siniestro"
@@ -186,14 +203,36 @@ namespace Regal_Plataforma.Models
 
     public class ArchivoDto
     {
-        public string NombreArchivo { get; set; }      // Nombre del archivo (para mostrar)
-        public string Ruta { get; set; }               // Ruta relativa del archivo (para acceder al archivo)
+        public string NombreArchivo { get; set; }
+        public string Ruta { get; set; }
         public string Extension { get; set; }
+        public bool EsDeTrabajo { get; set; } = false;
+        public int? TrabajoPk { get; set; } // Si aplica
     }
+
     public class ArchivoViewModel
     {
         public string Nombre { get; set; }
         public string Entidad { get; set; }
         public int Id { get; set; }
     }
+    // ViewModels
+    public class VM_TrabajoAsignado
+    {
+        public Trabajo Trabajo { get; set; }
+        public List<ArchivoDto> Archivos { get; set; } = new();
+        public string NotaNueva { get; set; }
+        public string DniFirma { get; set; }
+        public string FirmaBase64 { get; set; }
+        public bool HayDaños { get; set; } = false;
+        public string Daños { get; set; }
+
+    }
+
+    public class VM_NotaLibreOperario
+    {
+        public string Nota { get; set; }
+    }
+
+
 }

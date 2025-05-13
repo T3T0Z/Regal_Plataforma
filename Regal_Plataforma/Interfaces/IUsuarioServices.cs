@@ -12,6 +12,4 @@ public interface IUsuarioServices
     Task<List<Usuario>> GetExternosAsync();
     Task<Usuario> GetUsuarioByUsuarioAsync(string usuario);
     Task<List<Role>> GetRolesAsync();
-    Task<VM_Month> GetMonthCalendarViewModel(int year, int month, int UsuarioPk);
-    Task<VM_CalendarioUsuario> GetYearCalendarViewModel(int year, int UsuarioPk);
 }

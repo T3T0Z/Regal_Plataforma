@@ -1,3 +1,4 @@
+ï»¿
 /*HEADER*/
 /* Estilos para el header */
 
@@ -147,7 +148,7 @@ label {
 .modal-header-custom {
     display: flex;
     align-items: center; /* Centrado vertical */
-    justify-content: center; /* Centra el título */
+    justify-content: center; /* Centra el tÃ­tulo */
     padding: 0.75rem 1.25rem;
     position: relative;
     background-color: #27436e;
@@ -208,7 +209,7 @@ html {
 }
 
 body {
-    min-height: 100vh; /* Altura mínima de la ventana */
+    min-height: 100vh; /* Altura mÃ­nima de la ventana */
     margin: 0;
     display: flex;
     flex-direction: column;
@@ -312,7 +313,7 @@ main {
 
 .btn-container {
     display: flex;
-    flex-wrap: wrap; /* Permite ajustar los botones en varias líneas si es necesario */
+    flex-wrap: wrap; /* Permite ajustar los botones en varias lÃ­neas si es necesario */
     justify-content: center;
     margin-bottom: 15px;
     gap: 10px;
@@ -323,10 +324,10 @@ main {
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-flex;
-    max-width: 88%; /* ajusta según tus necesidades */
+    max-width: 88%; /* ajusta segÃºn tus necesidades */
 }
 
-/* Botón de subir */
+/* BotÃ³n de subir */
 #btnScrollTop {
     position: fixed;
     bottom: 1%; /* Valor por defecto */
@@ -458,7 +459,7 @@ main {
 
 .info-line {
     display: flex;
-    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
+    flex-wrap: wrap; /* Para que se adapte en pantallas pequeÃ±as */
 }
 
 .info-col {
@@ -533,7 +534,7 @@ main {
 }
 
 .col-acciones {
-    width: 5%;
+    width: 5% !important;
 }
 
 .tabla-notas {
@@ -652,4 +653,11 @@ main {
 
 .actualDay {
     background-color: lightgreen !important;
+}
+
+#canvasFirma {
+    border: 2px solid #333;
+    width: 100%;
+    height: 300px;
+    touch-action: none;
 }

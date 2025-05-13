@@ -2,21 +2,27 @@
 
 <!-- Contenedor principal de la tarjeta -->
 <div class="encargo-container">
-    <div class="encargo-header">
+    <div class="encargo-header" onclick="toggleCalendarioBody()">
         <div class="header-left">
-            <span class="header-title">Calendario de Usuario</span>
+            <span class="header-title">Calendario</span>
         </div>
     </div>
 
-    <div class="encargo-body" id="notasencargoBody">
+    <div class="encargo-body" id="calendarioBody">
         <div class="month-calendar-detail">
             <div class="calendario-header">
                 <div class="header-left">
                     <span class="header-title">@(new DateTime(Model.Year, Model.Month, 1).ToString("MMMM yyyy").ToUpper())</span>
                 </div>
                 <div class="header-right">
-                    <button class="btn" onclick="verYear(@Model.Year, @Model.UsuarioPk)">Volver al calendario anual</button>
-                    <button class="btn mx-2" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEdit?UsuarioPk={Model.UsuarioPk}")', 'modalLgBody')">Nuevo Trabajo</button>
+                    <button class="btn" 
+                        onclick="verYear(@Model.Year,
+                                @(Model.UsuarioPk != null ? Model.UsuarioPk : "null"),
+                                @(Model.ObraPk != null ? Model.ObraPk : "null"),
+                                @(Model.SiniestroPk != null ? Model.SiniestroPk : "null"))">
+                        Volver al calendario anual
+                    </button>
+                    <button class="btn mx-2" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEdit?UsuarioPk={Model.UsuarioPk}&ObraPk={Model.ObraPk}&SiniestroPk={Model.SiniestroPk}")', 'modalLgBody')">Nuevo Trabajo</button>
                 </div>
             </div>
 
@@ -49,15 +55,20 @@
                         <tr>
                             @foreach (var day in week.Days)
                             {
-                                <td class="calendar-day @(day.IsCurrentMonth ? "current-month" : "other-month") @(GetDayCssClass(day.Date, Model.Holidays)) @(day.actualDay ? "actualDay" : "")"
+                                <td class="calendar-day @(day.IsCurrentMonth ? "current-month" : "other-month") @(GetDayCssClass(day.Date, Model.Holidays)) @(day.actualDay && day.IsCurrentMonth ? "actualDay" : "")"
                                     data-date="@day.Date.ToString("yyyy-MM-dd")"
-                                    onclick="cargarTrabajosDiaUsuario(@Model.UsuarioPk, '@day.Date.ToString("yyyy-MM-dd")')">
+                                    onclick="cargarTrabajosDia(
+                                        @(Model.UsuarioPk != null ? Model.UsuarioPk : "null"),
+                                        @(Model.ObraPk != null ? Model.ObraPk : "null"),
+                                        @(Model.SiniestroPk != null ? Model.SiniestroPk : "null"),
+                                        '@day.Date.ToString("yyyy-MM-dd")')">
                                     @if (day.IsCurrentMonth)
                                     {
                                         <div>@day.Date.Day</div>
                                         @if (day.Trabajos != null && day.Trabajos.listTrabajos.Any())
                                         {
                                             <span class="badge badge-info">@day.Trabajos.listTrabajos.Count Asignados</span>
+                                            <span class="badge badge-dark">@day.HorasTotales Horas</span>
                                         }
                                     }
                                 </td>
@@ -76,6 +87,18 @@
     adjustCalendarHeader();
     window.addEventListener('resize', adjustCalendarHeader);
 
+    function toggleCalendarioBody() {
+        const body = document.getElementById("calendarioBody");
+
+        if (body.style.display === "none" || body.classList.contains("d-none")) {
+            body.style.display = "block";
+            body.classList.remove("d-none");
+        } else {
+            body.style.display = "none";
+            body.classList.add("d-none");
+        }
+    }
+
     function adjustCalendarHeader() {
         if (window.innerWidth > 768) {
             document.querySelector('.header-wide').style.display = '';
@@ -86,12 +109,22 @@
         }
     }
 
-    function cargarTrabajosDiaUsuario (usuarioPk, date) {
+    function cargarTrabajosDia (usuarioPk, obraPk, siniestroPk, date) {
+        // Construimos el objeto paso a paso
+        var data = { date: date };   // el campo date nunca falta
+
+        if (usuarioPk != null || usuarioPk != 0)   data.UsuarioPk   = usuarioPk
+        else data.UsuarioPk = 0;
+        if (obraPk    != null || obraPk != 0) data.ObraPk = obraPk;
+        else data.ObraPk = 0;
+        if (siniestroPk != null || siniestroPk != 0) data.SiniestroPk = siniestroPk;
+        else data.SiniestroPk = 0;
+
         // Llamada AJAX a la acción GetTrabajos del controlador Trabajos.
         $.ajax({
             url: '/Trabajos/GetTrabajos',
             type: 'GET',
-            data: { UsuarioPk: usuarioPk, date: date},
+            data: data,
             success: function (response) {
                 // Inserta la vista retornada en el div .trabajosDiaUsuario
                 $(".trabajosDiaUsuario").html(response.partial);
@@ -100,8 +133,35 @@
                 Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Error cargando trabajos del dia del usuario, prueba a intentarlo de nuevo mas tarde o pongase en contacto con un administrador'
-                    });
+                        text: 'Error cargando trabajos del dia, prueba a intentarlo de nuevo mas tarde o pongase en contacto con un administrador'
+                });
+            }
+        });
+    }
+    function verYear(year, usuarioPk, obraPk, siniestroPk)
+    {
+        // Construimos el objeto paso a paso
+        var data = { year: year };   // el campo date nunca falta
+
+        if (usuarioPk != null || usuarioPk != 0)   data.UsuarioPk   = usuarioPk 
+        else data.UsuarioPk = 0;
+        if (obraPk    != null || obraPk != 0) data.ObraPk = obraPk;
+        else data.ObraPk = 0;
+        if (siniestroPk != null || siniestroPk != 0) data.SiniestroPk = siniestroPk;
+        else data.SiniestroPk = 0;
+
+        $.ajax({
+            url: '/Calendario/YearCalendarPartial',
+            data: data,
+            success: function(result) {
+                $(".calendario").html(result.partial);
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error cargando calendario anual, prueba a intentarlo de nuevo mas tarde o pongase en contacto con un administrador'
+                });
             }
         });
     }

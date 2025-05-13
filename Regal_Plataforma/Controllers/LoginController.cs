@@ -45,18 +45,23 @@ namespace Regal_Plataforma.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult Index(VM_Login vm)
+        public async Task<ActionResult> Index(VM_Login vm)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, vm.usuario ?? "VACIO", "Entra en inicio de sesion");
+            await AppLogger.WriteAsync(LogType.Info, vm.usuario ?? "VACIO", "Entra en inicio de sesion");
 
             if (!string.IsNullOrEmpty(vm.usuario))
             {
+                await AppLogger.WriteAsync(LogType.Info, vm.usuario ?? "VACIO", "1");
+
                 Usuario usuario = _usuarios.GetUsuarioByUsuarioAsync(vm.usuario).Result;
+                await AppLogger.WriteAsync(LogType.Info, vm.usuario ?? "VACIO", "1.1");
                 if (usuario != null)
                 {
+                    await AppLogger.WriteAsync(LogType.Info, vm.usuario ?? "VACIO", "2");
                     //if (Func_Comunes.EncryptClaveUsuario(vm.contrasena) == usuario.Contrasena)
                     if (vm.contrasena == usuario.Contrasena)
                     {
+                        await AppLogger.WriteAsync(LogType.Info, vm.usuario ?? "VACIO", "3");
                         var claims = new List<Claim>
                         {
                             new Claim(ClaimTypes.NameIdentifier, usuario.UsuarioPk.ToString()),
@@ -73,23 +78,24 @@ namespace Regal_Plataforma.Controllers
 
                         HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
-                        Func_Comunes.LogsAplicacion(TiposLogs.INFO, vm.usuario, $"Inicio de sesion correcto - PK ({usuario.UsuarioPk}) - Rol ({usuario.RolPkNavigation.Rol}) - Name ({usuario.Usuario1})");
+                        await AppLogger.WriteAsync(LogType.Info, vm.usuario, $"Inicio de sesion correcto - PK ({usuario.UsuarioPk}) - Rol ({usuario.RolPkNavigation.Rol}) - Name ({usuario.Usuario1})");
 
                         if (usuario.RolPkNavigation.Rol == "Gestor")
-                        {
                             return RedirectToAction("Index", "Gestion");
-                        }
-                        return RedirectToAction("Index", "Home");
+                        else if (usuario.RolPkNavigation.Rol == "Operario")
+                            return RedirectToAction("Index", "Operario");
+                        else
+                            return RedirectToAction("Index", "Home");
                     }
                     else
                     {
-                        Func_Comunes.LogsAplicacion(TiposLogs.ERROR, vm.usuario, "Clave incorrecta");
+                        await AppLogger.WriteAsync(LogType.Error, vm.usuario, "Clave incorrecta");
                         ModelState.AddModelError("contrasena", "Clave incorrecta");
                     }
                 }
                 else
                 {
-                    Func_Comunes.LogsAplicacion(TiposLogs.ERROR, vm.usuario, "Usuario no encontrado");
+                    await AppLogger.WriteAsync(LogType.Error, vm.usuario, "Usuario no encontrado");
                     ModelState.AddModelError("usuario", "Usuario no encontrado");
                 }
             }
@@ -97,9 +103,9 @@ namespace Regal_Plataforma.Controllers
             return View();
         }
 
-        public ActionResult Logout(string? returnUrl = null)
+        public async Task<ActionResult> Logout(string? returnUrl = null)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Cerrar sesion usuario (AccountController/Logout)");
+            await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Cerrar sesion usuario (AccountController/Logout)");
 
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 

@@ -2,12 +2,12 @@
 
 <div class="encargo-container">
     <div class="encargo-header" onclick="toggleEncargoBody()">
-        <div class="header-left">
+        <div class="header-left d-none d-xl-block">
             <span class="header-title" id="InfoGeneralEncargos">Información General del Encargo</span>
         </div>
         <!-- Se añade onclick="event.stopPropagation()" para que al interactuar con este bloque no se dispare el toggle -->
         <div class="header-right" onclick="event.stopPropagation()">
-            <button class="btn-header-white mx-2" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetTrabajos?SiniestroPk={Model.OrderDatos.SiniestroPk}")', 'modalLgBody')">Ver Trabajos</button>
+            <button class="btn-header-white mx-2" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetTrabajos?SiniestroPk={Model.OrderDatos.SiniestroPk}")', 'modalLgBody')">Ver Trabajos (@Model.OrderDatos.SiniestroPkNavigation.Trabajos.Count())</button>
             <button class="btn-header-white mx-2" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEdit?SiniestroPk={Model.OrderDatos.SiniestroPk}")', 'modalLgBody')">Nuevo Trabajo</button>
             <button class="btn-header-white mx-2" onclick="cargarPartialEnModal('modalLg', '/Archivos/Galeria?entidad=Siniestro&entidadPk=@Model.OrderDatos.SiniestroPk', 'modalLgBody')"> Ver Archivos </button>
             <label for="selectGremioEncargo">Gremio:</label>

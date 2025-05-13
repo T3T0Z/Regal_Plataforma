@@ -1,0 +1,202 @@
+﻿@model VM_VerDetallesObra;
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-2"></div>
+        <h3 class="text-center col-8">Detalles de la Obra <span style="color:red;">@Model.Obra.Nombre</span> </h3>
+        <div class="col-2"></div>
+    </div>
+    <div class="detallesObra">
+        <partial name="~/Views/Shared/PartialViews/_detallesObra.cshtml" model="@Model" />
+    </div>
+
+    <div class="calendario">
+        <partial name="~/Views/Shared/PartialViews/_calendarioMensual.cshtml" model="@Model.Calendario.Calendars.Where(x=> x.Year == DateTime.Now.Year && x.Month == DateTime.Now.Month).FirstOrDefault()" />
+    </div>
+
+    <div class="notasObra">
+        <partial name="~/Views/Shared/PartialViews/_notasObra.cshtml" model="@Model.Notas" />
+    </div>
+    <button class="btnBack btn" onclick="window.location.href='/Obras/Index'">
+        Volver a mis obras
+    </button>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#createNotaModal').on('show.bs.modal', function () {
+                // Limpia el contenido del textarea dentro del modal
+                $(this).find('textarea#textoNota').val('');
+            });
+        });
+
+
+        function editarObra(obraPk)
+        {
+            $.ajax({
+                url: "/Obras/GetEdit",
+                method: 'GET',
+                data: { ObraPk: obraPk },
+                success: function (res) {
+                    $("#modalLgBody").html(res.partial);
+                    $("#modalLg").modal('show');
+                },
+                error: function () {
+                    Swal.fire({ icon: "error", title: "Error", text: "No se pudo cargar la obra." });
+                }
+            });
+        }
+
+
+        function guardarObra()
+        {
+            // Verifica si el formulario es válido antes de hacer submit
+            if (!$("#formObra").valid()) {
+                return;
+            }
+
+            let formData = $("#formObra").serialize();
+
+            $.ajax({
+                url: '/Obras/Guardar',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status === "OK") {
+                        $('#modalGeneral').modal('hide');
+                        $("#modalLg").modal('hide');
+                        Swal.fire({
+                            title: 'Correcto',
+                            text: 'Obra guardada con éxito.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload(); // Recarga para actualizar lista
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error actualizando obra'
+                    });
+                }
+            });
+        }
+
+        function crearNota(Obra_PK) {
+            let formData = $("#formNotaObra").serialize();
+
+            $.ajax({
+                url: '/Obras/CreateEditNotaObra', // Asegúrate de que la ruta es correcta
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.status === "OK") {
+                        $("#modalLg").modal('hide');
+                        Swal.fire({
+                            timer: 1500,
+                            title: "CORRECTO",
+                            text: "La nota ha sido creada",
+                            icon: "success"
+                        }).then(() => {
+                            // Actualiza el contenido de la partial view del encargo
+                            $(".notasObra").html(response.partial);
+                        });
+                    } else {
+                        Swal.fire({
+                            timer: 1500,
+                            icon: "error",
+                            title: "ERROR",
+                            text: response.message,
+                            footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        timer: 1500,
+                        icon: "error",
+                        title: "ERROR",
+                        text: "Error creando nota",
+                        footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                    });
+                }
+            });
+        }
+
+        // Eliminar nota vía AJAX
+        function eliminarNota(id, Obra_PK) {
+            Swal.fire({
+                title: "¿Estás seguro de eliminar esta nota?",
+                text: "No podrás revertir esta acción",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Eliminar",
+                cancelButtonText:"Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Obras/DeleteNotaObra', // Asegúrate de que la ruta es correcta
+                        type: 'POST',
+                        data: { NotasObra_PK: id, Obra_PK: Obra_PK },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === "OK") {
+                                $("#modalLg").modal('hide');
+                                // Actualiza el contenido de la partial view de la obra
+                                Swal.fire({
+                                    timer: 1500,
+                                    title: "Eliminada",
+                                    text: "La nota ha sido eliminada",
+                                    icon: "success"
+                                }).then(() => {
+                                    // Actualiza el contenido de la partial view del encargo
+                                    $(".notasObra").html(response.partial);
+                                });
+                            } else {
+                                Swal.fire({
+                                    timer: 1500,
+                                    icon: "error",
+                                    title: "ERROR",
+                                    text: response.message,
+                                    footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                timer: 1500,
+                                icon: "error",
+                                title: "ERROR",
+                                text: "La nota ha sido eliminada",
+                                footer: 'Intentalo de nuevo en unos instantes o pongase en contacto con un administrador'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function toggleEncargoBody() {
+            const body = document.getElementById("encargoBody");
+
+            if (body.style.display === "none" || body.classList.contains("d-none")) {
+                body.style.display = "block";
+                body.classList.remove("d-none");
+            } else {
+                body.style.display = "none";
+                body.classList.add("d-none");
+            }
+        }
+    </script>
+}

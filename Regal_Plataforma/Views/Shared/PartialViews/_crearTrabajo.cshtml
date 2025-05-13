@@ -7,7 +7,6 @@
 
 <form id="formTrabajo">
     @Html.HiddenFor(x => x.Trabajo.TrabajoPk)
-    @Html.HiddenFor(x => x.Trabajo.EstadoTrabajoPk)
 
     <div id="mensaje-error" class="alert alert-danger d-none" role="alert" style="white-space: pre-line;">
     </div>
@@ -38,7 +37,7 @@
             @Html.DropDownListFor(x => x.Trabajo.EstadoTrabajoPk,
                     new SelectList(Model.listEstadosTrabajo, "EstadoTrabajoPk", "Estado"),
                         "Seleccione un estado",
-                        new { @class = "form-control selectpicker", @data_live_search = "true", disabled = "disabled" })
+                        new { @class = "form-control selectpicker select-estado", @data_live_search = "true" })
         </div>
     </div>
 
@@ -71,10 +70,21 @@
         </div>
     </div>
 
+    <div class="row fila-fechas-real d-none">
+        <div class="form-group col-md-6 mb-3">
+            <label for="FechaAsignada">Fecha Real</label>
+            @Html.TextBoxFor(model => model.Trabajo.FechaEjecucion, new { id = "fechaReal", @class = "form-control", type = "datetime-local" })
+        </div>
+        <div class="form-group col-md-6 mb-3">
+            <label for="FechaFinAsignada">Fecha Fin Real</label>
+            @Html.TextBoxFor(model => model.Trabajo.FechaFinEjecucion, new { id = "fechaFinReal", @class = "form-control", type = "datetime-local" })
+        </div>
+    </div>
+
     <div class="row">
         <div class="form-group col-md-12 mb-3">
             <label for="Descripcion">Descripcion</label>
-            @Html.TextAreaFor(model => model.Trabajo.Descripcion, new { @class = "form-control" })
+            @Html.TextAreaFor(model => model.Trabajo.DescripcionAdministrador, new { @class = "form-control" })
         </div>
     </div>
 
@@ -103,7 +113,22 @@
                 }
             }
         });
+
+        const $filaFechas = $('.fila-fechas-real');
+        const $estado     = $('select[name="Trabajo.EstadoTrabajoPk"]');
+
+        // ---------- función que muestra / oculta -----------------
+        function toggleFechasReal() {
+            $filaFechas.toggleClass('d-none', $estado.val() !== "3");
+        }
+
+        // llamada inicial por si el modelo ya trae 3
+        toggleFechasReal();
+
+        // evento propio de bootstrap‑select al cambiar la selección
+        $estado.on('changed.bs.select', toggleFechasReal);
     });
+
     function guardarTrabajo()
     {
         // Verifica si el formulario es válido antes de hacer submit

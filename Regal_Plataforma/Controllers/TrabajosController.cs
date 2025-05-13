@@ -81,7 +81,7 @@ namespace Regal_Plataforma.Controllers
 
         public async Task<IActionResult> Guardar(Trabajo Trabajo)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.Identity.Name, $"Guardando Trabajo con PK = {Trabajo.TrabajoPk}");
+            await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Guardando Trabajo con PK = {Trabajo.TrabajoPk}");
 
             var result = Trabajo.TrabajoPk == 0
                 ? await _trabajo.CreateTrabajoAsync(Trabajo)
@@ -89,11 +89,11 @@ namespace Regal_Plataforma.Controllers
 
             if (result.resultado == Resultado.OK)
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.Identity.Name, $"Trabajo con PK = {Trabajo.TrabajoPk} guardada correctamente");
+                await AppLogger.WriteAsync(LogType.Info, User.Identity.Name, $"Trabajo con PK = {Trabajo.TrabajoPk} guardada correctamente");
                 return Json(new { status = "OK" });
             }
 
-            Func_Comunes.LogsAplicacion(TiposLogs.ERROR, User.Identity.Name, $"Error guardando la Trabajo con PK = {Trabajo.TrabajoPk}");
+            await AppLogger.WriteAsync(LogType.Error, User.Identity.Name, $"Error guardando la Trabajo con PK = {Trabajo.TrabajoPk}");
             return Json(new { status = "KO", message = result.mensaje });
         }
 
@@ -122,7 +122,7 @@ namespace Regal_Plataforma.Controllers
 
         public async Task<JsonResult> Eliminar(int TrabajoPk, int UsuarioPk, DateTime date)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar Trabajo - TrabajoPk = {TrabajoPk}");
+            await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar Trabajo - TrabajoPk = {TrabajoPk}");
             Resultado resultado = await _trabajo.DeleteTrabajoAsync(TrabajoPk);
             if (resultado == Resultado.OK)
             {
@@ -134,14 +134,25 @@ namespace Regal_Plataforma.Controllers
                 vm.Dia = date.ToString("dd/MM/yyyy");
 
                 var html = _renderer.RenderPartialToStringAsync("~/Views/Shared/PartialViews/_listaTrabajos.cshtml", vm);
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar Trabajo correcto - TrabajoPk = {TrabajoPk}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar Trabajo correcto - TrabajoPk = {TrabajoPk}");
                 return Json(new { status = "OK", partial = html });
             }
             else
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar Trabajo incorrecto - TrabajoPk = {TrabajoPk}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar Trabajo incorrecto - TrabajoPk = {TrabajoPk}");
                 return Json(new { status = "KO", message = "Error eliminando trabajo" });
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DescargarActa(int trabajoPk)
+        {
+            var trabajo = await _trabajo.GetTrabajoByPkAsync(trabajoPk);
+
+            var pdfBytes = await _trabajo.GenerarActaTrabajo(trabajo);
+
+            var nombre = $"Acta_{trabajo.SiniestroPkNavigation.DetallesSiniestroPkNavigation.NumeroSiniestro}.pdf";
+            return File(pdfBytes, "application/pdf", nombre);
         }
 
         public async Task<IActionResult> GetNotasTrabajo(int Trabajo_PK)
@@ -173,7 +184,7 @@ namespace Regal_Plataforma.Controllers
 
         public async Task<JsonResult> CreateEditNotaTrabajo(VM_NotasTrabajo notasTrabajo)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Obra - NotasTrabajoPk = {notasTrabajo.Nota.NotasTrabajoPk}");
+            await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Obra - NotasTrabajoPk = {notasTrabajo.Nota.NotasTrabajoPk}");
 
             NotasTrabajo nota = notasTrabajo.Nota;
 
@@ -191,19 +202,19 @@ namespace Regal_Plataforma.Controllers
 
                 string partialHtml = _renderer.RenderPartialToStringAsync("~/Views/Shared/PartialViews/_notasTrabajo.cshtml", vm);
 
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Trabajo correcto - NotasTrabajoPk = {notasTrabajo.Nota.NotasTrabajoPk}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Trabajo correcto - NotasTrabajoPk = {notasTrabajo.Nota.NotasTrabajoPk}");
                 return Json(new { status = "OK", partial = partialHtml });
             }
             else
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Trabajo incorrecto - NotasTrabajoPk = {nota.NotasTrabajoPk}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Crear nota Trabajo incorrecto - NotasTrabajoPk = {nota.NotasTrabajoPk}");
                 return Json(new { status = "KO", message = "Error editando nota" });
             }
         }
 
         public async Task<JsonResult> DeleteNota(int NotasTrabajo_PK, int Trabajo_PK)
         {
-            Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Trabajo - NotasTrabajoPk = {NotasTrabajo_PK}");
+            await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Trabajo - NotasTrabajoPk = {NotasTrabajo_PK}");
             bool success = await _notaService.DeleteNotaTrabajoAsync(NotasTrabajo_PK);
             if (success)
             {
@@ -214,12 +225,12 @@ namespace Regal_Plataforma.Controllers
 
                 string partialHtml = _renderer.RenderPartialToStringAsync("~/Views/Shared/PartialViews/_notasTrabajo.cshtml", vm);
 
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Trabajo correcto - NotasTrabajoPk = {NotasTrabajo_PK}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Trabajo correcto - NotasTrabajoPk = {NotasTrabajo_PK}");
                 return Json(new { status = "OK", partial = partialHtml });
             }
             else
             {
-                Func_Comunes.LogsAplicacion(TiposLogs.INFO, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Trabajo incorrecto - NotasTrabajoPk = {NotasTrabajo_PK}");
+                await AppLogger.WriteAsync(LogType.Info, User.FindFirstValue(ClaimTypes.NameIdentifier), $"Eliminar nota Trabajo incorrecto - NotasTrabajoPk = {NotasTrabajo_PK}");
                 return Json(new { status = "KO", message = "Error eliminando nota" });
             }
         }

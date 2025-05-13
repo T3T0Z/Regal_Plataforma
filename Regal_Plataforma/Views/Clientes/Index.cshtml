@@ -71,8 +71,8 @@
             $("#searchInput").on("keyup", function () {
                 const value = $(this).val().toLowerCase();
                 $(".card-custom").each(function () {
-                    const nombre = $(this).data("nombre");
-                    $(this).toggle(nombre.includes(value));
+                    var cardText = $(this).find(".card-content").text().toLowerCase();
+                    $(this).toggle(cardText.includes(value));
                 });
             });
 

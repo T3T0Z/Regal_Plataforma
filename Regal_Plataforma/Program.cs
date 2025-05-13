@@ -48,6 +48,7 @@ builder.Services.AddTransient<IRazorPartialToStringRenderer, RazorPartialToStrin
 builder.Services.AddDistributedMemoryCache();
 
 // Registrar el servicio
+builder.Services.AddScoped<IOperarioService, OperarioService>();
 builder.Services.AddScoped<IUsuarioServices, UsuarioServices>();
 builder.Services.AddScoped<IOrderDatosServices, OrderDatosServices>();
 builder.Services.AddScoped<IGremiosServices, GremioServices>();
@@ -56,7 +57,10 @@ builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IObraService, ObraService>();
 builder.Services.AddScoped<ITrabajosServices, TrabajosServices>();
 builder.Services.AddScoped<IArchivoService, ArchivoService>();
+builder.Services.AddScoped<ICalendarServices, CalendarServices>();
+//builder.Services.AddHttpClient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpClient<IAPIServices, ApiService>();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 

@@ -1,0 +1,73 @@
+﻿@model VM_Calendario
+
+
+<!-- Contenedor principal de la tarjeta -->
+<div class="encargo-container">
+    <div class="encargo-header" onclick="toggleNotasEncargoBody()">
+        <div class="header-left">
+            <span class="header-title">Calendario</span>
+        </div>
+    </div>
+
+    <div class="encargo-body mb-0 pb-0" id="notasencargoBody">
+        <div class="calendar-overview">
+            <div class="calendario-header" onclick="toggleNotasEncargoBody()">
+                <div class="header-left">
+                    <span class="header-title">Año @Model.Year</span>
+                </div>
+                <div class="header-right">
+                    <button class="btn mx-2" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEdit?UsuarioPk={Model.UsuarioPk}&ObraPk={Model.ObraPk}&SiniestroPk={Model.SiniestroPk}")', 'modalLgBody')">Nuevo Trabajo</button>
+                </div>
+            </div>
+            <div class="row">
+                @foreach (var calendar in Model.Calendars)
+                {
+                    <div class="col-4 col-sm-3 p-0">
+                        <div class="month-tile @(calendar.actualMonth ? "actualMonth" : "")"
+                             onclick="verMes(
+                                @calendar.Year,
+                                @calendar.Month,
+                                @(Model.UsuarioPk != null ? Model.UsuarioPk : "null"),
+                                @(Model.ObraPk != null ? Model.ObraPk : "null"),
+                                @(Model.SiniestroPk != null ? Model.SiniestroPk : "null"))">
+                            @(new DateTime(calendar.Year, calendar.Month, 1).ToString("MMMM").ToUpper())
+                            <br />
+                            @calendar.HorasTotales Horas
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function verMes(year, month, usuarioPk, obraPk, siniestroPk)
+    {
+        debugger;
+        // Construimos el objeto paso a paso
+        var data = { year: year };   // el campo date nunca falta
+        var data = { month: month };   // el campo date nunca falta
+
+        if (usuarioPk != null)   data.UsuarioPk   = usuarioPk
+        else data.UsuarioPk = 0;
+        if (obraPk    != null) data.ObraPk = obraPk;
+        else data.ObraPk = 0;
+        if (siniestroPk != null) data.SiniestroPk = siniestroPk;
+        else data.SiniestroPk = 0;
+
+        $.ajax({
+            url: '/Calendario/MonthCalendarPartial',
+            data: data,
+            success: function(result) {
+                $(".calendario").html(result.partial);
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error cargando calendario mensual, prueba a intentarlo de nuevo mas tarde o pongase en contacto con un administrador'
+                });
+            }
+        });
+    }
+</script>

@@ -12,4 +12,5 @@ public interface ITrabajosServices
     Task<M_Resultado> CreateTrabajoAsync(Trabajo trabajo);
     Task<M_Resultado> UpdateTrabajoAsync(Trabajo trabajo);
     Task<Resultado> DeleteTrabajoAsync(int TrabajoPk);
+    Task<byte[]> GenerarActaTrabajo(Trabajo trabajo);
 }

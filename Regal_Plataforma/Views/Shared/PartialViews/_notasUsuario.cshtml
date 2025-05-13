@@ -2,7 +2,7 @@
 
 <!-- Contenedor principal de la tarjeta -->
 <div class="encargo-container">
-    <div class="encargo-header" onclick="toggleNotasEncargoBody()">
+    <div class="encargo-header" onclick="toggleNotasUsuarioBody()">
         <div class="header-left">
             <span class="header-title">Notas del Usuario</span>
         </div>
@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    <div class="encargo-body" id="notasencargoBody">
+    <div class="encargo-body" id="notasUsuarioBody">
         <table class="table table-striped tabla-notas align-middle">
             <thead class="thead-notas">
                 <tr class="filas-tablasfilas-tablas-titulo">
@@ -48,3 +48,17 @@
         </table>
     </div>
 </div>
+<script>
+
+    function toggleNotasUsuarioBody() {
+        const body = document.getElementById("notasUsuarioBody");
+
+        if (body.style.display === "none" || body.classList.contains("d-none")) {
+            body.style.display = "block";
+            body.classList.remove("d-none");
+        } else {
+            body.style.display = "none";
+            body.classList.add("d-none");
+        }
+    }
+</script>

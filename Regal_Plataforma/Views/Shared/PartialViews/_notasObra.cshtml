@@ -1,41 +1,62 @@
 ﻿@model VM_NotasObra;
+<!-- Contenedor principal de la tarjeta -->
+<div class="encargo-container">
+    <div class="encargo-header" onclick="toggleNotasEncargoBody()">
+        <div class="header-left">
+            <span class="header-title">Notas del Encargo</span>
+        </div>
+        <!-- Se añade onclick="event.stopPropagation()" para que al interactuar con este bloque no se dispare el toggle -->
+        <div class="header-right">
+            <button class="btn-crearnota" onclick="cargarPartialEnModal('modalLg', '@($"/Obras/GetCreateEditNotaObra?Obra_PK={Model.Obra_PK}")', 'modalLgBody')">Nueva Nota</button>
+        </div>
+    </div>
 
-<table class="table table-striped tabla-notas align-middle">
-    <thead class="thead-notas">
-        <tr class="filas-tablasfilas-tablas-titulo">
-            <th class="col-fecha filas-tablas-titulo">Fecha</th>
-            <th class="col-usuario filas-tablas-titulo">Usuario</th>
-            <th class="filas-tablas-titulo">Nota</th>
-            <th class="filas-tablas-titulo col-acciones">Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.listNotas.Count > 0)
-        {
-            foreach (var nota in Model.listNotas.OrderByDescending(x => x.FechaCreacion))
-            {
-                <tr>
-                    <td class="filas-tablas">@nota.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td class="filas-tablas">@nota.UsuarioPkNavigation?.Nombre</td>
-                    <td class="filas-tablas">@nota.Nota</td>
-                    <td class="filas-tablas">
-                        <i class="icon fa-solid fa-pen-to-square" onclick="cargarPartialEnModal('modalLg', '@($"/Obras/GetCreateEditNotaObra?NotasObra_PK={nota.NotasObrasPk}")', 'modalLgBody')"></i>
-                        <i class="icon fa-solid fa-trash ml-2" onclick="eliminarNota(@nota.NotasObrasPk, @nota.ObraPk)"></i>
-                    </td>
+    <div class="encargo-body" id="notasBody">
+        <table class="table table-striped tabla-notas align-middle">
+            <thead class="thead-notas">
+                <tr class="filas-tablasfilas-tablas-titulo">
+                    <th class="col-fecha filas-tablas-titulo">Fecha</th>
+                    <th class="col-usuario filas-tablas-titulo">Usuario</th>
+                    <th class="filas-tablas-titulo">Nota</th>
+                    <th class="filas-tablas-titulo col-acciones">Acciones</th>
                 </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="4" class="text-center text-muted">No hay notas registradas</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<!-- Se añade onclick="event.stopPropagation()" para que al interactuar con este bloque no se dispare el toggle -->
-<div class="modal-footer">
-    <button type="button" class="btn my-0" data-dismiss="modal">Cerrar</button>
-    <button class="btn" onclick="cargarPartialEnModal('modalLg', '@($"/Obras/GetCreateEditNotaObra?Obra_PK={Model.Obra_PK}")', 'modalLgBody')">Nueva Nota</button>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.listNotas.Count > 0)
+                {
+                    foreach (var nota in Model.listNotas.OrderByDescending(x => x.FechaCreacion))
+                    {
+                        <tr>
+                            <td class="filas-tablas">@nota.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="filas-tablas">@nota.UsuarioPkNavigation?.Nombre</td>
+                            <td class="filas-tablas">@nota.Nota</td>
+                            <td class="filas-tablas">
+                                <i class="icon fa-solid fa-pen-to-square" onclick="cargarPartialEnModal('modalLg', '@($"/Obras/GetCreateEditNotaObra?NotasObra_PK={nota.NotasObrasPk}")', 'modalLgBody')"></i>
+                                <i class="icon fa-solid fa-trash ml-2" onclick="eliminarNota(@nota.NotasObrasPk, @nota.ObraPk)"></i>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No hay notas registradas</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
+<script>
+    function toggleNotasEncargoBody() {
+        const body = document.getElementById("notasBody");
+
+        if (body.style.display === "none" || body.classList.contains("d-none")) {
+            body.style.display = "block";
+            body.classList.remove("d-none");
+        } else {
+            body.style.display = "none";
+            body.classList.add("d-none");
+        }
+    }
+</script>

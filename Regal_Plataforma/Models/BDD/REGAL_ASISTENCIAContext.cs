@@ -17,6 +17,8 @@ public partial class REGAL_ASISTENCIAContext : DbContext
 
     public virtual DbSet<Cliente> Clientes { get; set; }
 
+    public virtual DbSet<DescansosTrabajo> DescansosTrabajos { get; set; }
+
     public virtual DbSet<DetallesSiniestro> DetallesSiniestros { get; set; }
 
     public virtual DbSet<Dialog> Dialogs { get; set; }
@@ -58,6 +60,8 @@ public partial class REGAL_ASISTENCIAContext : DbContext
     public virtual DbSet<TiposIntervencione> TiposIntervenciones { get; set; }
 
     public virtual DbSet<Trabajo> Trabajos { get; set; }
+
+    public virtual DbSet<UbicacionesTrabajo> UbicacionesTrabajos { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
@@ -138,6 +142,24 @@ public partial class REGAL_ASISTENCIAContext : DbContext
                 .HasForeignKey(d => d.TipoClientePk)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CLIENTES_TIPOS_CLIENTES");
+        });
+
+        modelBuilder.Entity<DescansosTrabajo>(entity =>
+        {
+            entity.HasKey(e => e.DescansosTrabajosPk);
+
+            entity.ToTable("DESCANSOS_TRABAJOS");
+
+            entity.Property(e => e.DescansosTrabajosPk).HasColumnName("DescansosTrabajos_PK");
+            entity.Property(e => e.Descripcion).IsUnicode(false);
+            entity.Property(e => e.FechaFin).HasColumnType("datetime");
+            entity.Property(e => e.FechaInicio).HasColumnType("datetime");
+            entity.Property(e => e.TrabajoPk).HasColumnName("Trabajo_PK");
+
+            entity.HasOne(d => d.TrabajoPkNavigation).WithMany(p => p.DescansosTrabajos)
+                .HasForeignKey(d => d.TrabajoPk)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DESCANSOS_TRABAJOS_TRABAJOS");
         });
 
         modelBuilder.Entity<DetallesSiniestro>(entity =>
@@ -817,7 +839,9 @@ public partial class REGAL_ASISTENCIAContext : DbContext
             entity.Property(e => e.TrabajoPk).HasColumnName("Trabajo_PK");
             entity.Property(e => e.Activo).HasDefaultValue(true);
             entity.Property(e => e.Daños).IsUnicode(false);
-            entity.Property(e => e.Descripcion).IsUnicode(false);
+            entity.Property(e => e.DescripcionAdministrador).IsUnicode(false);
+            entity.Property(e => e.DescripcionParteGeneralli).IsUnicode(false);
+            entity.Property(e => e.DescripcionTrabajo).IsUnicode(false);
             entity.Property(e => e.Dnifirma)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -830,8 +854,18 @@ public partial class REGAL_ASISTENCIAContext : DbContext
             entity.Property(e => e.FechaEjecucion).HasColumnType("datetime");
             entity.Property(e => e.FechaFinAsignada).HasColumnType("datetime");
             entity.Property(e => e.FechaFinEjecucion).HasColumnType("datetime");
+            entity.Property(e => e.NombreAseguradoParteGeneralli)
+                .HasMaxLength(500)
+                .IsUnicode(false);
             entity.Property(e => e.ObraPk).HasColumnName("Obra_PK");
+            entity.Property(e => e.Observaciones).IsUnicode(false);
             entity.Property(e => e.SiniestroPk).HasColumnName("Siniestro_PK");
+            entity.Property(e => e.TiempoTransacurridoTrabajo)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.TiempoTranscurridoDescansos)
+                .HasMaxLength(500)
+                .IsUnicode(false);
             entity.Property(e => e.UasignadoPk).HasColumnName("UAsignado_PK");
             entity.Property(e => e.UgestorPk).HasColumnName("UGestor_PK");
 
@@ -857,6 +891,26 @@ public partial class REGAL_ASISTENCIAContext : DbContext
                 .HasForeignKey(d => d.UgestorPk)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TRABAJOS_USUARIOS");
+        });
+
+        modelBuilder.Entity<UbicacionesTrabajo>(entity =>
+        {
+            entity.HasKey(e => e.UbicacionTrabajoPk);
+
+            entity.ToTable("UBICACIONES_TRABAJOS");
+
+            entity.Property(e => e.UbicacionTrabajoPk).HasColumnName("UbicacionTrabajo_PK");
+            entity.Property(e => e.Accuracy).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.FechaCreacion)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Latitude).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.Longitude).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.TrabajoPk).HasColumnName("Trabajo_PK");
+
+            entity.HasOne(d => d.TrabajoPkNavigation).WithMany(p => p.UbicacionesTrabajos)
+                .HasForeignKey(d => d.TrabajoPk)
+                .HasConstraintName("FK_UBICACIONES_TRABAJOS_UBICACIONES_TRABAJOS");
         });
 
         modelBuilder.Entity<Usuario>(entity =>

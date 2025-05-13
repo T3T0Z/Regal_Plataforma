@@ -1,16 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
+﻿using iText.Forms;
+using iText.Forms.Fields;
+using iText.IO.Image;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using Newtonsoft.Json;
+using Regal_Plataforma.Models.BDD;
+using System.IO;
+using System.Reflection.PortableExecutable;
+using System.Security.Claims;
+using System.Text;
 
 namespace Regal_Plataforma.Funciones
 {

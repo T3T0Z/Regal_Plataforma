@@ -1,22 +1,17 @@
 ﻿@model VM_listaTrabajos;
 
 <div class="encargo-body">
-@*     <div class="calendario-header" onclick="toggleNotasEncargoBody()">
-        <div class="header-left">
-            <span class="header-title">Trabajos</span>
-        </div>
-    </div> *@
-
     <table class="table table-striped tabla-notas align-middle">
         <thead class="thead-notas">
             <tr class="filas-tablas-titulo filas-tablas">
                 <th class="filas-tablas-titulo">Estado</th>
                 <th class="filas-tablas-titulo">Obra/Siniestro</th>
-                <th class="filas-tablas-titulo">Fecha Asignada</th>
-                <th class="filas-tablas-titulo">Fecha Ejecucion</th>
+                <th class="filas-tablas-titulo">Fecha</th>
+                <th class="filas-tablas-titulo">Horario</th>
+                <th class="filas-tablas-titulo">Duración</th>
                 <th class="filas-tablas-titulo">Operario</th>
                 <th class="filas-tablas-titulo">Gestor</th>
-                <th class="filas-tablas-titulo col-acciones ">Acciones</th>
+                <th class="filas-tablas-titulo col-acciones" style="width:auto !important">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -26,12 +21,14 @@
                 {
                     <tr>
                         <td class="filas-tablas">@trabajo.EstadoTrabajoPkNavigation.Estado</td>
-                        <td class="filas-tablas">@(trabajo.ObraPk == null ? trabajo.SiniestroPkNavigation?.DetallesSiniestroPkNavigation.NumeroSiniestro : trabajo.ObraPkNavigation?.Nombre)</td>
-                        <td class="filas-tablas">@trabajo.FechaAsignada</td>
-                        <td class="filas-tablas">@trabajo.FechaEjecucion</td>
+                        <td class="filas-tablas">@(trabajo.ObraPk != null ? trabajo.ObraPkNavigation?.Nombre : trabajo.SiniestroPkNavigation != null ? trabajo.SiniestroPkNavigation.DetallesSiniestroPkNavigation.NumeroSiniestro : "----------------")</td>
+                        <td class="filas-tablas">@trabajo.FechaAsignada.ToString("dd/MM/yyyy")</td>
+                        <td class="filas-tablas">@(trabajo.FechaAsignada.ToString("HH:mm") + " - " + trabajo.FechaFinAsignada.ToString("HH:mm"))</td>
+                        <td class="filas-tablas">@(!string.IsNullOrEmpty(trabajo.TiempoTransacurridoTrabajo) ? trabajo.TiempoTransacurridoTrabajo + " minutos" : "----------") </td>
                         <td class="filas-tablas">@trabajo.UasignadoPkNavigation.Nombre</td>
                         <td class="filas-tablas">@trabajo.UgestorPkNavigation.Nombre</td>
                         <td class="filas-tablas">
+                            <i title="Ver Archivos" class="icon fa-solid fa-folder-open" onclick="cargarPartialEnModal('modalLg', '/Archivos/Galeria?entidad=Trabajo&entidadPk=@trabajo.TrabajoPk', 'modalLgBody')"></i>
                             <i title="Ver Trabajo" class="icon fa-solid fa-pen-to-square" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetCreateEdit?TrabajoPk={trabajo.TrabajoPk}")', 'modalLgBody')"></i>
                             <i title="Eliminar Trabajo" class="icon fa-solid fa-trash" onclick="eliminarTrabajo(@trabajo.TrabajoPk)"></i>
                             <i title="Notas Trabajo" class="icon fa-solid fa-note-sticky" onclick="cargarPartialEnModal('modalLg', '@($"/Trabajos/GetNotasTrabajo?Trabajo_PK={trabajo.TrabajoPk}")', 'modalLgBody')"></i>

@@ -1,0 +1,422 @@
+﻿@model VM_TrabajoAsignado
+
+<div class="container mt-4">
+    <h4>Trabajo asignado a realizar</h4>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            @if(Model.Trabajo.ObraPk != null)
+            {
+                <p><strong>Obra:</strong> @Model.Trabajo.ObraPkNavigation.Nombre</p>
+                <p><strong>Dirección:</strong> @Model.Trabajo.ObraPkNavigation.DireccionPkNavigation.NombreVia</p>
+                <p><strong>Descripcion:</strong> @Model.Trabajo.DescripcionAdministrador</p>
+                <p><strong>Fecha asignada:</strong> @Model.Trabajo.FechaAsignada.ToString("dd/MM/yyyy HH:mm")</p>
+                <p><strong>Fecha fin asignada:</strong> @Model.Trabajo.FechaFinAsignada.ToString("dd/MM/yyyy HH:mm")</p>
+            }
+            else if (Model.Trabajo.SiniestroPk != null)
+            {
+                @* <p><strong>Numero Siniestro:</strong> @Model.Trabajo.SiniestroPkNavigation.DetallesSiniestroPkNavigation.NumeroSiniestro</p> *@
+                <p><strong>Dirección:</strong> @Model.Trabajo.SiniestroPkNavigation.OrderDatos.FirstOrDefault()?.DireccionPkNavigation.NombreVia</p>
+
+                @if (Model.Trabajo.SiniestroPkNavigation.OrderDatos.FirstOrDefault()?.PaseguradoPkNavigation != null)
+                {
+                    <p><strong>Asegurado:</strong> @Model.Trabajo.SiniestroPkNavigation.OrderDatos.FirstOrDefault()?.PaseguradoPkNavigation.Nombre @Model.Trabajo.SiniestroPkNavigation.OrderDatos.FirstOrDefault()?.PaseguradoPkNavigation.Apellido1 @Model.Trabajo.SiniestroPkNavigation.OrderDatos.FirstOrDefault()?.PaseguradoPkNavigation.Apellido2 </p>
+                }
+                <p><strong>Descripcion:</strong> @Model.Trabajo.DescripcionAdministrador</p>
+                <p><strong>Fecha asignada:</strong> @Model.Trabajo.FechaAsignada.ToString("dd/MM/yyyy HH:mm")</p>
+                <p><strong>Fecha fin asignada:</strong> @Model.Trabajo.FechaFinAsignada.ToString("dd/MM/yyyy HH:mm")</p>
+            }
+            else
+            {
+                <p><strong>Momento Libre, compruebe si hay nuevos trabajos y sino, pongase en contacto con el gestor</strong></p>
+                <p>Debes describir que has hecho en el tiempo libre que has tenido</p>
+            }
+        </div>
+    </div>
+
+    <form id="formTrabajo">
+        @Html.HiddenFor(x => x.Trabajo.TrabajoPk , new { @data_ignore="ls" })
+        @Html.HiddenFor(x => x.Trabajo.FechaAsignada , new { @data_ignore="ls" })
+        @Html.HiddenFor(x => x.Trabajo.FechaFinAsignada, new { @data_ignore="ls" })
+        @Html.HiddenFor(x => x.Trabajo.FechaEjecucion, new { @data_ignore="ls" })
+        @Html.HiddenFor(x => x.Trabajo.ObraPk, new { @data_ignore="ls" })
+        @Html.HiddenFor(x => x.Trabajo.SiniestroPk, new { @data_ignore="ls" })
+        @Html.HiddenFor(x => x.Trabajo.EstadoTrabajoPk, new { @data_ignore="ls" })
+        
+        <div id="mensaje-error" class="alert alert-danger d-none" role="alert" style="white-space: pre-line;">
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-12 mb-3">
+                <label>Descripcion Trabajo</label>
+                @Html.TextAreaFor(model => model.Trabajo.DescripcionTrabajo, new { @class = "form-control" })
+            </div>
+        </div>
+
+        @if(Model.Trabajo.EstadoTrabajoPk == 2)
+        {
+            @if (Model.Trabajo.SiniestroPk != 0)
+            {
+                <!-- === NUEVO: check HayDaños === -->
+                <div class="row">
+                    <div class="form-group col-md-6 mb-2">
+                        <div class="custom-control custom-switch">
+                            @Html.CheckBoxFor(m => m.Trabajo.HayDaños,
+                                              new { @class = "custom-control-input",
+                                                    id = "chkHayDanos"})
+                            <label class="custom-control-label" for="chkHayDanos">
+                                ¿Hay daños?
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="grupoDanos" class="row">
+                    <div class="form-group col-md-12 mb-3">
+                        <label>Daños</label>
+                        @Html.TextAreaFor(model => model.Trabajo.Daños, new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label>Nombre Asegurado Generali</label>
+                        @Html.TextBoxFor(model => model.Trabajo.NombreAseguradoParteGeneralli, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group col-md-6 mb-3">
+                        <label>DNI Generali</label>
+                        @Html.TextBoxFor(model => model.Trabajo.Dnifirma, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12 mb-3">
+                        <label>Descripcion Parte Generali</label>
+                        @Html.TextAreaFor(model => model.Trabajo.DescripcionParteGeneralli, new { @class = "form-control" })
+                    </div>
+                </div>
+            }
+        }
+
+    </form>
+    
+    @if(Model.Trabajo.EstadoTrabajoPk == 2)
+    {
+        <div class="container mt-4">
+            @if (Model.Trabajo.SiniestroPk != 0)
+            {
+                <button class="btn" onclick="mostrarModalFirma()">Firmar</button>
+            }
+            <button class="btn" onclick="cargarPartialEnModal('modalLg', '/Archivos/Galeria?entidad=Trabajo&entidadPk=@Model.Trabajo.TrabajoPk' , 'modalLgBody' )">Fotos</button>
+        </div>
+    }
+
+    <div class="form-group mt-3 text-right">
+        @if (Model.Trabajo.EstadoTrabajoPk == 2)
+        {
+            <button class="btn btn-descanso" onclick="nuevoDescanso(@Model.Trabajo.TrabajoPk)">Descanso</button>
+        }
+        else
+        {
+
+            @* <button class="btn btn-comprobar-trabajo" onclick="location.reload()">Comprobar Trabajos</button> *@
+        }
+        <button class="btn btn-fin-trabajo" onclick="finalizarTrabajo()">Finalizar trabajo</button>
+    </div>
+</div>
+<!-- Modal --------------------------------------------------------------->
+<div class="modal fade modal-firma" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Firma del asegurado/perjudicado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria‑label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <!-- Formulario para subir archivos -->
+            <form id="formSubidaArchivosFirma" enctype="multipart/form-data" class="mb-4">
+                <input type="hidden" name="Entidad" value="Trabajo" />
+                <input type="hidden" name="EntidadPk" value="@Model.Trabajo.TrabajoPk" />
+                <div class="modal-body text-center firma-container">
+                </div>
+            </form>
+
+            <div class="modal-footer">
+                <button type="button" class="btn" onclick="borrarFirma()">Borrar</button>
+                <button type="button" class="btn" onclick="guardarFirma()">Guardar Firma</button>
+                <button type="button" class="btn" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>
+        const INTERVAL_MS = 5 * 60 * 1_000;              // 5 minutos
+        const POST_URL    = '/Operarios/GuardarUbicacion';      // endpoint MVC
+        const OPTIONS     = { enableHighAccuracy:true, timeout:10_000 };
+
+        /* ====  SOLICITA LA PRIMERA POSICIÓN Y ARRANCA EL BUCLE ========= */
+        navigator.geolocation.getCurrentPosition(startLoop, handleError, OPTIONS);
+
+        /* --------------------------------------------------------------- */
+        function startLoop() {
+            // guarda inmediatamente y después cada 5 min
+            savePosition();
+            setInterval(savePosition, INTERVAL_MS);
+        }
+
+        /* --------------------------------------------------------------- */
+        function savePosition() {
+
+            navigator.geolocation.getCurrentPosition(pos => {
+
+                const data = {
+                    TrabajoPk : @Model.Trabajo.TrabajoPk,
+                    latitude   : pos.coords.latitude,
+                    longitude  : pos.coords.longitude,
+                    accuracy   : pos.coords.accuracy, // ISO 8601
+                };
+
+                $.ajax({
+                        url: '/Operario/GuardarUbicacion',
+                        type: 'POST',
+                        data: data
+                    });
+
+            },handleError, OPTIONS);
+        }
+
+        
+        /* --------------------------------------------------------------- */
+        function handleError(err) {
+            console.warn('Geolocalización rechazada o no disponible:', err.message);
+            // Si quieres volver a intentarlo más tarde:
+            setTimeout(() => navigator.geolocation.getCurrentPosition(startLoop, handleError, OPTIONS), 60_000);
+        }
+
+
+
+        // clave única para este formulario
+        const STORAGE_KEY = "miFormData";
+
+        // ----- 1)  cargar valores guardados -----------
+        document.addEventListener("DOMContentLoaded", () => {
+          const datos = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+          for (const [k, v] of Object.entries(datos)) {
+              const campo = document.querySelector(`[name='${k}']:not([data-ignore='ls'])`);
+            if (campo) campo.value = v;
+          }
+        });
+
+        // ----- 2)  guardar cada cambio ----------------
+        document.getElementById("formTrabajo").addEventListener("input", e => {
+          const form    = e.currentTarget;
+          const datos   = Object.fromEntries(new FormData(form).entries());
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
+        });
+
+        async function finalizarTrabajo() {
+            // --- 1.  Intentar obtener la ubicación ------------------------------
+            const coords = await new Promise(resolve => {
+                if (!navigator.geolocation) {                // API no soportada
+                    return resolve(null);
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    pos => resolve({
+                        lat: pos.coords.latitude,
+                        lng: pos.coords.longitude,
+                        acc: pos.coords.accuracy
+                    }),
+                    _err => resolve(null),                   // denegado o timeout
+                    { enableHighAccuracy: true, timeout: 6000 }
+                );
+            });
+
+            let formData = $("#formTrabajo").serialize();
+            let ubi = $.param({
+                Latitude : coords?.lat ?? 'null',
+                Longitude: coords?.lng ?? 'null',
+                Accuracy : coords?.acc ?? 'null'
+            });
+
+            Swal.fire({
+                title: "¿Estás seguro de finalizar el trabajo?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Si",
+                cancelButtonText:"Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Operario/FinalizarTrabajo',
+                        type: 'POST',
+                        data: formData + '&' + ubi,
+                        success: function (res) {
+                            if (res.status === "OK") {
+                                localStorage.removeItem("miFormData");
+                                Swal.fire({
+                                    title: "Finalizado",
+                                    icon: "success",
+                                    timer: 1500, 
+                                    showCancelButton: false,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                        location.reload(); // Recarga para actualizar lista
+                                    });
+                            } else {
+                                document.getElementById("mensaje-error").textContent = res.message;
+                                document.getElementById("mensaje-error").classList.remove("d-none");
+                            }
+                        },
+                        error: function () {
+                            Swal.fire("Error", "No se pudo finalizar el trabajo", "error");
+                        }
+                    });
+                }
+            });
+
+        }
+
+        function mostrarModalFirma () {
+            const $modal = $('.modal-firma').first();
+
+            /* 1. limpiamos cualquier handler de un “namespace” propio -------- */
+            $modal.off('.firma');
+
+            /* 2. En show.bs.modal creamos un canvas nuevo -------------------- */
+            $modal.on('show.bs.modal.firma', function () {
+                // vaciamos el contenedor y añadimos un canvas limpio
+                $(this).find('.firma-container')
+                    .html('<canvas class="canvas-firma" style="width:100%;height:300px;border:1px solid #000;touch-action:none"></canvas>');
+            });
+
+            /* 3. Cuando ya está visible, lo inicializamos -------------------- */
+            $modal.on('shown.bs.modal.firma', initFirmaCanvas);
+
+            /* 4. Mostramos la modal ------------------------------------------ */
+            $modal.modal('show');
+        }
+
+        function initFirmaCanvas () {
+          const canvas = document.querySelector('.canvas-firma');
+          if (!canvas) return;                  // seguridad
+
+          /*  Ajustar tamaño físico al tamaño CSS --------------------------- */
+          const rect = canvas.getBoundingClientRect();
+          canvas.width  = rect.width;
+          canvas.height = rect.height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+          ctx.lineWidth   = 2;
+          ctx.lineCap     = 'round';
+          ctx.strokeStyle = '#000';
+
+          let dibujando = false;
+
+          function pos (evt) {
+            const r = canvas.getBoundingClientRect();
+            const p  = evt.touches ? evt.touches[0] : evt;
+            return { x : p.clientX - r.left,  y : p.clientY - r.top };
+          }
+
+          /* ---- quitamos listeners viejos, por si los hubiera ------------- */
+          ['mousedown','mousemove','mouseup','mouseleave',
+           'touchstart','touchmove','touchend','touchcancel'
+          ].forEach(ev => canvas.removeEventListener(ev,()=>{}));
+
+          /* ---- ratón ------------------------------------------------------ */
+          canvas.addEventListener('mousedown',  e => { dibujando = true; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);});
+          canvas.addEventListener('mousemove',  e => { if(!dibujando) return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke();});
+          ['mouseup','mouseleave'].forEach(ev => canvas.addEventListener(ev, () => dibujando=false));
+
+          /* ---- táctil ----------------------------------------------------- */
+          canvas.addEventListener('touchstart', e => { e.preventDefault(); dibujando = true; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);});
+          canvas.addEventListener('touchmove',  e => { e.preventDefault(); if(!dibujando) return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke();});
+          ['touchend','touchcancel'].forEach(ev => canvas.addEventListener(ev, () => dibujando=false));
+        }
+
+        // Limpiar el lienzo
+        function borrarFirma() {
+          const canvas = document.querySelector('.canvas-firma');
+          const ctx    = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        };
+
+        // Guardar la firma como PNG
+        function guardarFirma() {
+            const canvas = document.querySelector('.canvas-firma');
+            canvas.toBlob(function(blob) {
+                if (!blob) {
+                    return Swal.fire('Error', 'No hay nada que guardar', 'warning');
+                }
+                // Montamos el FormData
+                const formData = new FormData();
+                // El tercer parámetro es el nombre de archivo sugerido
+                formData.append('archivos', blob, 'firma.png');
+                // Añade aquí tu entidad y su PK (puedes extraerlo de un hidden en la modal)
+                const form = document.getElementById("formSubidaArchivosFirma");
+                formData.append("entidad", form.querySelector('input[name="Entidad"]').value);
+                formData.append("entidadPk", form.querySelector('input[name="EntidadPk"]').value);
+                formData.append("firma", true);
+
+                $.ajax({
+                    url: '/Archivos/Subir',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res.status === "OK") {
+                            Swal.fire("Subido", "Archivo subido", "success");
+                        } else {
+                            Swal.fire("Error", "No se pudo subir el archivo", "error");
+                        }
+                    },
+                    error: function () {
+                        Swal.fire("Error", "No se pudo subir el archivo", "error");
+                    }
+                });
+            }, 'image/png');
+        };
+
+        function nuevoDescanso(id) {
+            Swal.fire({
+                title: "¿Estás seguro de iniciar un descanso?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Si",
+                cancelButtonText:"Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/Operario/Descanso?TrabajoPk=' + id;
+                }
+            });
+            
+        };
+
+        function toggleGrupoDanos() {
+            const visible = $('#chkHayDanos').is(':checked');
+            // Con toggle() también ocultamos el fieldset en el DOM
+            $('#grupoDanos').toggle(visible);
+        }
+
+        $(document).ready(function () {
+            // 1) Al cargar la página
+            toggleGrupoDanos();
+
+            // 2) Cada vez que cambie el checkbox
+            $('#chkHayDanos').on('change', toggleGrupoDanos);
+        });
+    </script>
+}
+
+

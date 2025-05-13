@@ -27,23 +27,37 @@ public partial class Trabajo
 
     public DateTime? FechaFinEjecucion { get; set; }
 
-    public string Descripcion { get; set; }
+    public string TiempoTranscurridoDescansos { get; set; }
+
+    public string TiempoTransacurridoTrabajo { get; set; }
+
+    public bool Urgencia { get; set; }
+
+    public string DescripcionAdministrador { get; set; }
 
     public bool Fotos { get; set; }
 
+    public string DescripcionTrabajo { get; set; }
+
     public bool HayFirma { get; set; }
 
+    public string NombreAseguradoParteGeneralli { get; set; }
+
     public string Dnifirma { get; set; }
+
+    public string DescripcionParteGeneralli { get; set; }
 
     public bool HayDaños { get; set; }
 
     public string Daños { get; set; }
 
-    public bool Urgencia { get; set; }
+    public string Observaciones { get; set; }
 
     public bool Activo { get; set; }
 
     public DateTime FechaCreacion { get; set; }
+
+    public virtual ICollection<DescansosTrabajo> DescansosTrabajos { get; set; } = new List<DescansosTrabajo>();
 
     public virtual EstadosTrabajo EstadoTrabajoPkNavigation { get; set; }
 
@@ -54,6 +68,8 @@ public partial class Trabajo
     public virtual Siniestro SiniestroPkNavigation { get; set; }
 
     public virtual Usuario UasignadoPkNavigation { get; set; }
+
+    public virtual ICollection<UbicacionesTrabajo> UbicacionesTrabajos { get; set; } = new List<UbicacionesTrabajo>();
 
     public virtual Usuario UgestorPkNavigation { get; set; }
 }
